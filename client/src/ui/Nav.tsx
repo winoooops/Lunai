@@ -1,20 +1,28 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+// import { Link, useLocation } from 'react-router-dom';
 
-const Nav: React.FC = () => {
-  const location = useLocation();
+interface NavProps {
+  children: React.ReactNode;
+}
+
+
+const Nav: React.FC<NavProps> = ({ children }) => {
+  // const location = useLocation();
 
   const navItems = [
-    { path: '/', label: 'Chat' },
+    { path: '/chat', label: 'Chat' },
     { path: '/code-review', label: 'Code Review' },
     { path: '/image-generation', label: 'Image Generation' },
     { path: '/search', label: 'Search' },
   ];
 
+  console.log(navItems);
+
   return (
-    <nav className="bg-black border-b border-claude-border p-4">
-      <ul className="flex space-x-4">
-        {navItems.map((item) => (
+    <nav className="z-[100] w-1/8 pl-4 bg-slate-800 absolute top-0 left-0">
+      <ul className="flex-col place-content-center">
+        {children}
+        {/* {navItems.map((item) => (
           <li key={item.path}>
             <Link
               to={item.path}
@@ -27,7 +35,7 @@ const Nav: React.FC = () => {
               {item.label}
             </Link>
           </li>
-        ))}
+        ))} */}
       </ul>
     </nav>
   );

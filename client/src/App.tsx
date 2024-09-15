@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import Chat from './features/Chat/Chat'
 import Layout from './ui/Layout'
@@ -10,6 +10,7 @@ function App() {
       <Router>
         <Layout>
           <Routes>
+            <Route path="/" element={<Navigate to="/chat" replace />} />
             <Route path="/chat" element={<Chat />} />
           </Routes>
         </Layout>
