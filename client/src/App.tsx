@@ -3,10 +3,12 @@ import './App.css'
 import Chat from './features/Chat/Chat'
 import Layout from './ui/Layout'
 import { UIContextProvider } from './contexts/UIContext'
+import { DnDContextProvider } from './contexts/DnDContext'
 
 function App() {
   return (
     <UIContextProvider>
+    <DnDContextProvider>
       <Router>
         <Layout>
           <Routes>
@@ -15,6 +17,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>  
+    </DnDContextProvider>  
     </UIContextProvider>
   )
 }

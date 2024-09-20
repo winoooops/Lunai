@@ -10,9 +10,11 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-
 	return (
-		<div className="flex bg-slate-800 dark:bg-[#252423] flex-col h-full w-full overflow-hidden justify-items-center">
+		<div 
+			onDrop={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
+			onDragOver={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
+			className="flex bg-slate-800 dark:bg-[#252423] flex-col h-full w-full overflow-hidden justify-items-center">
 			<Nav>
 				<MenuButton colorScheme={{ bg: "bg-slate-800", hover:"hover:text-yellow-300", text: "text-slate-200" }} />
 				<Button colorScheme={{ bg:"bg-slate-800", hover:"hover:text-yellow-300", text:"text-slate-200" }}>

@@ -1,5 +1,5 @@
-import Button from "../ui/Button"
 import { RiAttachment2, RiSendPlane2Line } from "react-icons/ri"
+import Button from "../../../ui/Button";
 
 interface MessageActionsProps {
     isFocus: boolean;

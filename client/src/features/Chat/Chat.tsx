@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { MessageBubble } from '../../components/MessageBubble';
-import MessageInput from '../../components/MessageInput';
+import { MessageBubble } from './Messages/MessageBubble';
+import MessageInput from './Messages/MessageInput';
+import { useDnDContext } from '../../contexts/DnDContext';
+import MessageFiles from './Messages/MessageFiles';
+import Dialog from '../../ui/Dialog';
 
 interface Message {
   isUser: boolean;
@@ -20,6 +23,7 @@ const initialMessages: Message[] = [
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { shouldShowFiles, fileDialogOpened, closeFile } = useDnDContext();
 
   const handleSendMessage = (message: string) => {
     setMessages([...messages, { isUser: true, content: message }]);
@@ -39,8 +43,18 @@ const Chat: React.FC = () => {
         ))}
       </div>
       <div className="w-full px-4 py-4">
+        {
+          shouldShowFiles && <MessageFiles />
+        }
         <MessageInput onSendMessage={handleSendMessage} />
       </div>
+
+      { fileDialogOpened && (
+        <Dialog onClose={closeFile} position="center">
+          should display file content here
+        </Dialog>
+      )
+      }
     </div>
   );
 };
