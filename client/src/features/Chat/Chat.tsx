@@ -3,7 +3,6 @@ import { MessageBubble } from './Messages/MessageBubble';
 import MessageInput from './Messages/MessageInput';
 import { useDnDContext } from '../../contexts/DnDContext';
 import MessageFiles from './Messages/MessageFiles';
-import Dialog from '../../ui/Dialog';
 
 interface Message {
   isUser: boolean;
@@ -23,12 +22,10 @@ const initialMessages: Message[] = [
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const { shouldShowFiles, fileDialogOpened, closeFile } = useDnDContext();
+  const { shouldShowFiles } = useDnDContext();
 
   const handleSendMessage = (message: string) => {
     setMessages([...messages, { isUser: true, content: message }]);
-    // Here you would typically send the message to your backend
-    // and then add the AI's response to the messages
   };
 
   return (
@@ -48,13 +45,6 @@ const Chat: React.FC = () => {
         }
         <MessageInput onSendMessage={handleSendMessage} />
       </div>
-
-      { fileDialogOpened && (
-        <Dialog onClose={closeFile} position="center">
-          should display file content here
-        </Dialog>
-      )
-      }
     </div>
   );
 };

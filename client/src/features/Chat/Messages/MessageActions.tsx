@@ -1,5 +1,5 @@
 import { RiAttachment2, RiSendPlane2Line } from "react-icons/ri"
-import Button from "../../../ui/Button";
+import Button, { FileUploadButton } from "../../../ui/Button";
 
 interface MessageActionsProps {
     isFocus: boolean;
@@ -13,10 +13,10 @@ const MessageActions: React.FC<MessageActionsProps> = ({ isFocus }) => {
 
     return (
         <div className="absolute items-center right-4 top-4 flex bg-slate-900">
-            <Button shape="pill">
+            <FileUploadButton shape="pill">
                 <RiAttachment2 />
-            </Button>
-            <Button type="submit" shape="pill" colorScheme={colorScheme} >
+            </FileUploadButton>
+            <Button shape="pill" type="submit" colorScheme={colorScheme} >
                 <RiSendPlane2Line />
             </Button>
         </div>

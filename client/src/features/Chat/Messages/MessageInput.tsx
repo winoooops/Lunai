@@ -4,7 +4,7 @@ import MessageActions from './MessageActions';
 import { RiFileCloudLine, RiFileImageLine, RiSearch2Line } from 'react-icons/ri';
 import { useDnDContext } from '../../../contexts/DnDContext';
 import { Dropdown, Ripple, initTWE } from "tw-elements";
-import { GrFormDown } from "react-icons/gr";
+import ModelSelector from './ModelSelector';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
@@ -55,22 +55,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
             </div>
           </label>
           <MessageActions isFocus={isFocus} />
-          <div className="absolute bottom-1 left-2">
-            <div className="relative" data-twe-dropdown-position="dropup">
-              <button
-                className="flex items-center rounded bg-slate-900 px-2 py-1 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-slate-600 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
-                type="button"
-                id="dropdownMenuButton1u"
-                data-twe-dropdown-toggle-ref
-                aria-expanded="false"
-                data-twe-ripple-init
-                data-twe-ripple-color="light"
-                >
-              Model
-              <GrFormDown />
-              </button>
-            </div>
-          </div>
+          <ModelSelector /> 
         </Textarea>
          
       </form>  

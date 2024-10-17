@@ -5,15 +5,13 @@ interface DnDContextType {
     isDragging: boolean;
     isDropped: boolean;
     shouldShowFiles: boolean;
-    fileDialogOpened: boolean;
     fileCount: number;
     handleDragOver: (e: React.DragEvent<HTMLElement>) => void;
     handleDragEnter: (e: React.DragEvent<HTMLElement>) => void;
     handleDragLeave: () => void;
     handleDropped: (e: React.DragEvent<HTMLElement>) => void; // Updated to accept a callback
+    handleFileAdd: (files: File[]) => void;
     handleFileRemove: (file: File) => void;
-    openFile: () => void;
-    closeFile: () => void;
 }
 
 const DnDContext = createContext<DnDContextType | undefined>(undefined);
@@ -22,7 +20,6 @@ export const DnDContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const [isDragging, setIsDragging] = useState(false);
     const [isDropped, setIsDropped] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
-    const [fileDialogOpened, setFileDialogOpened] = useState(false);
 
     const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
@@ -41,7 +38,7 @@ export const DnDContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setIsDropped(true);
 
         const droppedFiles = Array.from(e.dataTransfer.files);
-        setFiles(prev => [...prev, ...droppedFiles])
+        handleFileAdd(droppedFiles);
     }
 
     const handleDragLeave = () => {
@@ -52,12 +49,13 @@ export const DnDContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setFiles(files => files.filter(f => f != file))
     }
 
+    const handleFileAdd = (files: File[]) => {
+        setFiles(prev => [...prev, ...files]);
+    }
+
     const shouldShowFiles = files.length > 0;
     const fileCount = files.length;
-
-    const openFile = () => setFileDialogOpened(true);
-    const closeFile = () => setFileDialogOpened(false);
-
+    
 
     return (
         <DnDContext.Provider value={{ 
@@ -65,15 +63,13 @@ export const DnDContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             files,
             isDragging, 
             isDropped, 
-            fileDialogOpened,
             fileCount,
             handleDragOver,
             handleDragEnter, 
             handleDropped,
             handleDragLeave,
+            handleFileAdd,
             handleFileRemove,
-            openFile,
-            closeFile,
         }}>
             {children}
         </DnDContext.Provider>

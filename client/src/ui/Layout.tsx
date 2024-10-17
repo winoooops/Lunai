@@ -4,12 +4,16 @@ import MainContent from './MainContent';
 import Button from './Button';
 import { RiAddLine, RiHistoryLine } from "react-icons/ri";
 import MenuButton from './MenuButton';
+import { Dialog } from './Dialog';
+import { useDialog } from '../contexts/DialogContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+	const { isOpen, content, } = useDialog();
+
 	return (
 		<div 
 			onDrop={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
@@ -24,7 +28,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 					<RiHistoryLine />
 				</Button>
 			</Nav>
-			<MainContent>{children}</MainContent>
+			<MainContent>
+				{children}
+				{ isOpen && 
+					<Dialog>
+						{ content }
+					</Dialog>	
+				}
+			</MainContent>
 		</div>
 		);
 };
