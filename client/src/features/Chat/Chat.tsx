@@ -3,6 +3,7 @@ import { MessageBubble } from './Messages/MessageBubble';
 import MessageInput from './Messages/MessageInput';
 import { useDnDContext } from '../../contexts/DnDContext';
 import MessageFiles from './Messages/MessageFiles';
+import MessageLanding from './Messages/MessagesLanding';
 
 interface Message {
   isUser: boolean;
@@ -31,13 +32,17 @@ const Chat: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-4 py-6">
-        {messages.map((message, index) => (
-          <MessageBubble
-            key={index}
-            isUser={message.isUser}
-            content={message.content}
-          />
-        ))}
+        {messages.length === 0 ? (
+          <MessageLanding />
+        ) : (
+          messages.map((message, index) => (
+            <MessageBubble
+              key={index}
+              isUser={message.isUser}
+              content={message.content}
+            />
+          ))
+        )}
       </div>
       <div className="w-full px-4 py-4">
         {
