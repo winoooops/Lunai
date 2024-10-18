@@ -46,7 +46,7 @@ const Button: React.FC<ButtonProps> = ({
             className={`
                 ${paddings[shape]}
                 font-semibold 
-                transition-colors duration-j200
+                transition-colors duration-200
                 focus:outline-none
                 ${shapeClasses[shape]} 
                 ${colorScheme.bg}

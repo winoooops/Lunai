@@ -19,6 +19,33 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+
+.entry {
+  overflow:hidden;
+}
+.entry .edit-btn,
+.entry .delete-btn {
+  color: transparent;
+  transition: color 0.3s;
+}
+
+.entry:hover .edit-btn,
+.entry:hover .delete-btn {
+  color: inherit; 
+} 
+
+.entry:hover .edit-btn:hover {
+  @apply bg-slate-900;
+  @apply rounded;
+}
+
+.entry:hover .delete-btn:hover {
+  @apply bg-red-900;
+  @apply rounded;
+}
+
+
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
-import Chat from './features/Chat/Chat'
+import Chat from './pages/Chat'
 import Layout from './ui/Layout'
 import { UIContextProvider } from './contexts/UIContext'
 import { DnDContextProvider } from './contexts/DnDContext'

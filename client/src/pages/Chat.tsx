@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { MessageBubble } from './Messages/MessageBubble';
-import MessageInput from './Messages/MessageInput';
-import { useDnDContext } from '../../contexts/DnDContext';
-import MessageFiles from './Messages/MessageFiles';
-import MessageLanding from './Messages/MessagesLanding';
+import { MessageBubble } from '../features/Chat/Messages/MessageBubble';
+import MessageInput from '../features/Chat/Messages/MessageInput';
+import { useDnDContext } from '../contexts/DnDContext';
+import MessageFiles from '../features/Chat/Messages/MessageFiles';
+import MessageLanding from '../features/Chat/Messages/MessagesLanding';
 
 interface Message {
   isUser: boolean;

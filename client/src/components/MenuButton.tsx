@@ -1,4 +1,4 @@
-import { DialogButton } from "./Dialog";
+import { DialogButton } from "../ui/Dialog";
 import { TbMoon2, TbPrompt } from "react-icons/tb";
 import { VscOpenPreview } from "react-icons/vsc";
 import { BiPaint } from "react-icons/bi";
