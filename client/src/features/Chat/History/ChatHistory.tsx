@@ -2,22 +2,15 @@ import { useState } from "react";
 import SearchBar from "../../../ui/SearchBar";
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
 import { RiChat1Line, RiDeleteBin2Line, RiEdit2Line } from "react-icons/ri";
+import { ChatItem } from "../../../types/Chat";
+import { useChatContext } from "../../../contexts/ChatContext";
 
-type ChatHistoryItem = {
-  title: string;
-  id: number;
-  timestamp: Date;
-}
 
-const items: ChatHistoryItem[] = [
-    {title: "I need help with my tax", id: 1, timestamp: new Date(Date.now() - 1000 * 60 * 10)},
-    {title: "can you sort out this json file for me? I am using it in my react application to define tailwind config", id: 2, timestamp: new Date(Date.now() - 1000 * 60 * 60)},
-    {title: "What is the best way to learn React?", id: 3, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) },
-];
+
 
 
 const ChatHistory: React.FC<{}> = ({}) => {
-  const [chatEntries, setChatEntries] = useState(items);
+  const { chats: chatEntries } = useChatContext();
   const [filtedEntries, setFilteredEntries] = useState(chatEntries);
 
   const onSearch = (query: string) => {
@@ -38,14 +31,14 @@ const ChatHistory: React.FC<{}> = ({}) => {
     }
     prev[timeAgo].push(entry);
     return prev;
-  }, {} as Record<string, ChatHistoryItem[]>);
+  }, {} as Record<string, ChatItem[]>);
 
 
-  const onEdit = (entry: ChatHistoryItem) => {
+  const onEdit = (entry: ChatItem) => {
     console.log(`should edit: ${entry}`);
   }
 
-  const onDelete = (entry: ChatHistoryItem) => {
+  const onDelete = (entry: ChatItem) => {
     console.log(`should delete: ${entry}`);
   }
   
@@ -65,7 +58,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
             Object.keys(groupedEntries).map((section) => (
               <div key={section} className="mb-4">
                 <h3 className="text-sm text-slate-500">{section}</h3>
-                {groupedEntries[section].map((entry) => (
+                {groupedEntries[section].map((entry:ChatItem) => (
                   <div key={entry.id} className="entry cursor-pointer justify-between px-2 py-1 rounded-md text-slate-200 hover:bg-slate-800 flex items-center gap-1">
                     <RiChat1Line />
                     <span className="flex-1 truncate">{entry.title}</span>

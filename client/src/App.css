@@ -44,6 +44,19 @@
   @apply rounded;
 }
 
+.chat-card .card-delete {
+  color: transparent;
+  background-color: transparent;
+  transition: color 0.3s;
+}
+
+.chat-card:hover .card-delete {
+  color: inherit;
+}
+
+.chat-card:hover .card-delete:hover {
+  color: red;
+}
 
 
 @keyframes logo-spin {

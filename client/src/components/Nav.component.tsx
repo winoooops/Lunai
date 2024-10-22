@@ -8,7 +8,7 @@ const NavComponent: React.FC<{}> = ({}) => {
   return (
     <Nav>
       <MenuButton colorScheme={{ bg: "bg-slate-800", hover:"hover:text-yellow-300", text: "text-slate-200" }} />
-      <Button colorScheme={{ bg:"bg-slate-800", hover:"hover:text-yellow-300", text:"text-slate-200" }}>
+      <Button className="bg-slate-800 text-yellow-300 text-slate-200">
         <RiAddLine />
       </Button>
       <ChatHistoryButton colorScheme={{ bg:"bg-slate-800", hover:"hover:text-yellow-300", text:"text-slate-200" }} />

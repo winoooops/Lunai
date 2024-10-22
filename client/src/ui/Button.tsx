@@ -1,17 +1,11 @@
 import React, { useRef } from 'react';
 import { useDnDContext } from '../contexts/DnDContext';
 
-interface ColorScheme {
-    bg: string;
-    text: string;
-    hover: string;
-}
-
 interface ButtonProps {
     children: React.ReactNode;
     type?: "button" | "submit" | "reset";
     shape?: 'rounded' | 'square' | 'pill';
-    colorScheme?: ColorScheme; 
+    className?: string; 
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     // Add other props as needed (e.g., onClick, type, disabled)
 }
@@ -20,11 +14,7 @@ const Button: React.FC<ButtonProps> = ({
     children, 
     shape = 'rounded', 
     type = "button",
-    colorScheme = {
-        bg: "bg-slate-800",
-        hover: "hover:bg-slate-600",
-        text: "text-slate-200"
-    },
+    className="bg-slate-800 hover:bg-slate-600 text-slate-200",
     ...props
 }) => {
 
@@ -49,9 +39,7 @@ const Button: React.FC<ButtonProps> = ({
                 transition-colors duration-200
                 focus:outline-none
                 ${shapeClasses[shape]} 
-                ${colorScheme.bg}
-                ${colorScheme.hover}
-                ${colorScheme.text}
+                ${className}
             `}
             type={type}
             {...props}
