@@ -2,13 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { DialogButtonType, DialogPosition, DialogProps } from '../types/Dialog';
 import { useDialog } from '../contexts/DialogContext';
 
-export const Dialog: React.FC<DialogProps> = ({ children, onClose }) => {
-    const { closeDialog, activeDialogId, variation, position, dialogRef } = useDialog();
+export const Dialog: React.FC<DialogProps> = ({ children }) => {
+    const { closeDialog, variation, position, dialogRef } = useDialog();
 
     const handleClickOutside = (e: MouseEvent) => {
         if(dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
-           closeDialog(activeDialogId!); 
-           onClose?.();
+           closeDialog();
         }
     }
 
@@ -20,10 +19,11 @@ export const Dialog: React.FC<DialogProps> = ({ children, onClose }) => {
         }
     }, []);
 
+    
     if(variation == "full") {
         return (
             <div ref={dialogRef} 
-                className="absolute z-10 bg-slate-700 shadow-lg rounded-lg p-4 mt-2 min-w-[200px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                className="absolute z-10 bg-slate-900 shadow-lg rounded-lg mt-2 min-w-[200px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
             >
                 {children}
             </div>
@@ -32,7 +32,7 @@ export const Dialog: React.FC<DialogProps> = ({ children, onClose }) => {
 
     return (
         <div ref={dialogRef} 
-            className="absolute z-10 bg-slate-700 shadow-lg rounded-lg p-4 mt-2 min-w-[200px]"
+            className="absolute z-10 shadow-lg rounded-lg min-w-[200px]"
             style={{ top: position.top, left: position.left }}
         >
             {children}    
@@ -58,7 +58,7 @@ export const DialogButton: React.FC<DialogButtonType> = ({ id, content, children
     }
     
     return (
-        <button className={className} type="button" onClick={handleClick} ref={buttonRef}>
+        <button className={`focus:outline-none ${className}`} type="button" onClick={handleClick} ref={buttonRef}>
            {children} 
         </button>
     )

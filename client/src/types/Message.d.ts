@@ -6,4 +6,5 @@ export interface Message {
 export interface MessageContextProps {
   messages: Message[];
   onSend: (message: string) => void;
+  onClear: () => void;
 }

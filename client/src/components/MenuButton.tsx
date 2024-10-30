@@ -3,18 +3,14 @@ import { TbMoon2, TbPrompt } from "react-icons/tb";
 import { VscOpenPreview } from "react-icons/vsc";
 import { BiPaint } from "react-icons/bi";
 import { RiSearch2Line } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import MenuModal from "./MenuModal";
 
 interface MenuButtonProps {
-  colorScheme: {
-    bg: string;
-    hover: string;
-    text: string;
-  }
+  className: string;
 }
 
 
-const MenuButton: React.FC<MenuButtonProps> = ({ colorScheme }) => {
+const MenuButton: React.FC<MenuButtonProps> = ({ className }) => {
   const navItems = [
     { path: '/chat', label: 'Chat', icon: <TbPrompt /> },
     { path: '/code-review', label: 'Code Review', icon: <VscOpenPreview /> },
@@ -28,21 +24,9 @@ const MenuButton: React.FC<MenuButtonProps> = ({ colorScheme }) => {
         variation="dropdown"
         className={`
           p-2 text-slate-200
-          ${colorScheme.bg}
-          ${colorScheme.hover}
-          ${colorScheme.text}
+          ${className}
         `}
-        content={
-          <ul className="flex flex-col"> {/* Use flex-col for vertical alignment */}
-            {navItems.map(item => (
-              <li key={item.path} className="flex items-center p-1"> {/* Flex for horizontal alignment */}
-                <Link to={item.path} className="flex place-items-center text-slate-200 no-underline hover:text-yellow-300">
-                  {item.icon} <span className="ml-2">{item.label}</span> {/* Add margin for spacing */}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        }
+        content={<MenuModal navItems={navItems} />}
       >
         <TbMoon2 />
       </DialogButton>

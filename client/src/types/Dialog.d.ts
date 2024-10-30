@@ -4,8 +4,8 @@ export interface DialogProps {
 }
 
 export interface DialogContextType {
-    openDialog: (id: string, content: ReactNode, dialogVariation: DialogVariation, dialogPosition: DialogPosition) => void;
-    closeDialog: (id: string) => void;
+    openDialog: (id: string, content: ReactNode, dialogVariation: DialogVariation, dialogPosition?: DialogPosition) => void;
+    closeDialog: () => void;
     isOpen: boolean;
     content: ReactNode | null;
     activeDialogId: string | null;

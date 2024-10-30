@@ -7,16 +7,12 @@ interface MessageActionsProps {
  
 
 const MessageActions: React.FC<MessageActionsProps> = ({ isFocus }) => {
-    const colorScheme = isFocus ? 
-        {bg:"bg-slate-200", hover: "hover:bg-slate-400", text:"text-slate-600"} :
-        undefined;
-
     return (
         <div className="absolute items-center right-4 top-4 flex bg-slate-900">
             <FileUploadButton shape="pill">
                 <RiAttachment2 />
             </FileUploadButton>
-            <Button shape="pill" type="submit" colorScheme={colorScheme} >
+            <Button shape="pill" type="submit" className={isFocus ? "bg-slate-200 hover:bg-slate-400 text-slate-600" : "bg-slate-900"} >
                 <RiSendPlane2Line />
             </Button>
         </div>

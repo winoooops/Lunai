@@ -10,10 +10,15 @@ export const MessageContextProvider: React.FC<{children: React.ReactNode }> = ({
     setMessages((prev) => [...prev, { isUser: true, content }]) 
   }
 
+  const onClear = () => {
+    setMessages([]);
+  }
+
   return (
     <MessageContext.Provider value={{
       messages,
-      onSend
+      onSend,
+      onClear
     }}>
       {children}
     </MessageContext.Provider>

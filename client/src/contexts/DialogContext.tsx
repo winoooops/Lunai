@@ -12,21 +12,20 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [position, setPosition] = useState<DialogPosition>({ left: 0, top: 0});
   const dialogRef = useRef<HTMLDivElement>(null); 
 
-  const openDialog = (id: string, content: ReactNode, dialogVariation: DialogVariation = "full", dialogPosition: DialogPosition) => {
-      setVariation(dialogVariation);
-      setContent(content);
-      setActiveDialogId(id);
-      setPosition(dialogPosition);
-      setIsOpen(true);
+  const openDialog = (id: string, content: ReactNode, dialogVariation: DialogVariation = "full", dialogPosition: DialogPosition = {top: 0, left:0}) => {
+    setIsOpen(true);
+    setVariation(dialogVariation);
+    setContent(content);
+    setActiveDialogId(id);
+    setPosition(dialogPosition);
   }
 
-  const closeDialog = (id: string | null) => {
-      if(id === activeDialogId) {
-          setContent(null);
-          setActiveDialogId(null);
-          setIsOpen(false);
-      }
+  const closeDialog = () => {
+      setContent(null);
+      setActiveDialogId(null);
+      setIsOpen(false);
   }
+    
 
   return (
       <DialogContext.Provider value={{ openDialog, closeDialog, isOpen, content, activeDialogId, variation, position, dialogRef }}>

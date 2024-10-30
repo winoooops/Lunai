@@ -23,18 +23,13 @@ const Button: React.FC<ButtonProps> = ({
         square: 'rounded-none',
         pill: 'rounded-full',
     };
-
-    const paddings = {
-        "pill": "px-3 py-2", 
-        "square": "px4 py-2",
-        "rounded": "px4 py-2"
-    }
+    
     
 
     return (
         <button
             className={`
-                ${paddings[shape]}
+                px-2 py-1
                 font-semibold 
                 transition-colors duration-200
                 focus:outline-none

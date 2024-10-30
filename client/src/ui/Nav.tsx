@@ -1,5 +1,4 @@
 import React from 'react';
-// import { Link, useLocation } from 'react-router-dom';
 
 interface NavProps {
   children: React.ReactNode;
@@ -8,8 +7,8 @@ interface NavProps {
 
 const Nav: React.FC<NavProps> = ({ children }) => {
   return (
-    <nav className="z-[100] w-1/8 pl-4 bg-slate-800 absolute top-0 left-0">
-      <ul className="flex-col place-content-center">
+    <nav className="z-[100] w-full pl-4 bg-slate-800">
+      <ul className="flex items-center justify-between">
         {children}
       </ul>
     </nav>

@@ -3,26 +3,17 @@ import { DialogButton } from "../../../ui/Dialog";
 import ChatHistory from "./ChatHistory";
 
 interface ChatHistoryButtonProps {
-  colorScheme: {
-    bg: string;
-    hover: string;
-    text: string;
-  }
+  className: string;
 }
 
 
-const ChatHistoryButton: React.FC<ChatHistoryButtonProps> = ({ colorScheme }) => {
+const ChatHistoryButton: React.FC<ChatHistoryButtonProps> = ({ className }) => {
   return (
     <>
       <DialogButton 
         id="history" 
         variation="dropdown" 
-        className={`
-          p-2
-          ${colorScheme.bg}   
-          ${colorScheme.hover}
-          ${colorScheme.text}
-        `}
+        className={`p-2 ${className}`}
         content={<ChatHistory/>}>
           <RiHistoryLine />
       </DialogButton>

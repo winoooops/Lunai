@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../../../ui/SearchBar";
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
-import { RiChat1Line, RiDeleteBin2Line, RiEdit2Line } from "react-icons/ri";
 import { ChatItem } from "../../../types/Chat";
 import { useChatContext } from "../../../contexts/ChatContext";
-
-
-
+import ChatLink from "./ChatLink";
+import { useNavigate } from "react-router-dom";
+import { useDialog } from "../../../contexts/DialogContext";
 
 
 const ChatHistory: React.FC<{}> = ({}) => {
   const { chats: chatEntries } = useChatContext();
+  const { closeDialog } = useDialog();
   const [filtedEntries, setFilteredEntries] = useState(chatEntries);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setFilteredEntries(chatEntries);
+  }, [chatEntries]);
+
 
   const onSearch = (query: string) => {
-    console.log(`should continue search with ${query}`);
     const lowercaseQuery = query.toLowerCase();
     const filtered = chatEntries.filter(entry => 
       entry.title.toLowerCase().includes(lowercaseQuery)
@@ -33,19 +38,14 @@ const ChatHistory: React.FC<{}> = ({}) => {
     return prev;
   }, {} as Record<string, ChatItem[]>);
 
-
-  const onEdit = (entry: ChatItem) => {
-    console.log(`should edit: ${entry}`);
-  }
-
-  const onDelete = (entry: ChatItem) => {
-    console.log(`should delete: ${entry}`);
-  }
   
-
+  const handleSelect = (id: number) => {
+    navigate(`/chat/${id}`);
+    closeDialog();
+  }
 
   return (
-    <div className="bg-slate-700 rounded-lg text-slate-200 px-1 max-w-[25em]">
+    <div className="bg-slate-900 rounded-lg text-slate-200 p-4 mt-2 w-[25em]">
       <h2 className="text-xs text-bold mb-4 font-semibold">All Chats</h2>
       <SearchBar onSearch={onSearch} placeholder="Search chats..."/>
       <div>
@@ -59,18 +59,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
               <div key={section} className="mb-4">
                 <h3 className="text-sm text-slate-500">{section}</h3>
                 {groupedEntries[section].map((entry:ChatItem) => (
-                  <div key={entry.id} className="entry cursor-pointer justify-between px-2 py-1 rounded-md text-slate-200 hover:bg-slate-800 flex items-center gap-1">
-                    <RiChat1Line />
-                    <span className="flex-1 truncate">{entry.title}</span>
-                    <div className="flex gap-1">
-                      <a className="edit-btn p-1" onClick={() => onEdit(entry)}>
-                        <RiEdit2Line />
-                      </a>
-                      <a className="delete-btn p-1" onClick={() => onDelete(entry)}>
-                        <RiDeleteBin2Line />
-                      </a>
-                    </div>
-                  </div>
+                  <ChatLink chatItem={entry} onSelect={handleSelect}/>                  
                 ))}
               </div>  
             ))

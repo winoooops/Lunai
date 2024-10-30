@@ -13,9 +13,24 @@ const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chats, setChats] = useState<ChatItem[]>(items)
 
+  const deleteChatById = (id: number) => {
+    setChats((prev) => prev.filter((chat: ChatItem) => chat.id !== id));
+  }
+
+  const editChat = (id: number, payload: Partial<ChatItem>) => {
+    setChats((prev) => prev.map((chat:ChatItem) => chat.id === id ? {...chat, ...payload} : chat));
+  }
+
+  const getChatInfo = (id: number): ChatItem | undefined => {
+    return chats.find((chat) => chat.id === id);
+  }
+
   return (
     <ChatContext.Provider value={{
-      chats
+      chats,
+      deleteChatById,
+      editChat,
+      getChatInfo
     }}>
       {children}
     </ChatContext.Provider>

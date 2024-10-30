@@ -1,5 +1,4 @@
 import { useChatContext } from "../../../contexts/ChatContext";
-import { formatTimeAgo } from "../../../utils/formatTimeAgo";
 import ChatCard from "./ChatCard";
 
 const ChatRecent: React.FC<{}> = ({}) => {
@@ -11,8 +10,8 @@ const ChatRecent: React.FC<{}> = ({}) => {
       <div className="grid grid-cols-2 gap-3">
       {
         chats.length > 0 && (
-          chats.map(chat => (
-            <ChatCard key={chat.id} title={chat.title} timeAgo={formatTimeAgo(chat.timestamp)} />
+          chats.map((chat, index) => (
+            <ChatCard key={index} chat={chat}/>
           ))
         )
       }
