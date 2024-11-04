@@ -1,6 +1,7 @@
 import { RiHistoryLine } from "react-icons/ri";
-import { DialogButton } from "../../../ui/Dialog";
 import ChatHistory from "./ChatHistory";
+import Button from "../../../ui/Button";
+import { useSidebar } from "../../../contexts/SidebarContext";
 
 interface ChatHistoryButtonProps {
   className: string;
@@ -8,16 +9,19 @@ interface ChatHistoryButtonProps {
 
 
 const ChatHistoryButton: React.FC<ChatHistoryButtonProps> = ({ className }) => {
+  const { openSidebar } = useSidebar();
+
+  const onClick = () => {
+    openSidebar("chat-history", <ChatHistory />);
+  }
+
   return (
-    <>
-      <DialogButton 
-        id="history" 
-        variation="dropdown" 
-        className={`p-2 ${className}`}
-        content={<ChatHistory/>}>
-          <RiHistoryLine />
-      </DialogButton>
-    </>
+    <Button 
+      className={`${className}`}
+      onClick={onClick}   
+    >
+      <RiHistoryLine />
+    </Button>
   );
 }
 

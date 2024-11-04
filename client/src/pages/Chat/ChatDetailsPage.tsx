@@ -20,7 +20,7 @@ const ChatDetailsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 w-[60%] mx-auto overflow-y-auto px-4 py-6">
+      <div className="flex-1 w-full overflow-y-auto px-4 py-6">
         {messages.length === 0 ? (
           <MessageLanding />
         ) : (

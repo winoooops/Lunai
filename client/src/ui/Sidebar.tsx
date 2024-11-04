@@ -1,44 +1,22 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from "react";
+import { useSidebar } from "../contexts/SidebarContext";
+import useMouseMoveOutside from "../hooks/useMouseMoveOutside";
+// import useMouseMoveOutside from "../hooks/useMouseMoveOutside";
 
-interface Session {
-  id: string;
-  title: string;
-}
+const Sidebar: React.FC = () => {
+  const { isOpened, isCollapsed, content, id, closeSidebar, onAnimationEnd} = useSidebar();
+  
 
-interface SidebarProps {
-  sessions: Session[];
-  currentOperation: string;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ sessions, currentOperation }) => {
-  const location = useLocation();
+  const { elementRef } = useMouseMoveOutside(isCollapsed, closeSidebar);
 
   return (
-    <aside className="w-64 bg-claude-gray border-r border-claude-border p-4 flex flex-col">
-      <ul className="space-y-2 flex-grow">
-        {sessions.map((session) => (
-          <li key={session.id}>
-            <Link
-              to={`/${currentOperation.toLowerCase()}/${session.id}`}
-              className={`block py-2 px-4 rounded transition-colors ${
-                location.pathname.includes(session.id)
-                  ? 'bg-claude-blue text-white'
-                  : 'hover:bg-white'
-              }`}
-            >
-              {session.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-auto pt-4 border-t border-claude-border">
-        <button className="w-full py-2 px-4 bg-claude-blue text-white hover:bg-blue-600 rounded transition-colors">
-          New Session
-        </button>
-      </div>
-    </aside>
+    <div id={id} ref={elementRef} 
+      className={`${isOpened ? "sidebar-in" : "sidebar-out"} rounded bg-slate-800 h-full pb-4 pl-1 translate-transform duration-300 ease-in-out `}
+      onAnimationEnd={onAnimationEnd}  
+    >
+      {content}
+    </div> 
   );
-};
+}
 
 export default Sidebar;

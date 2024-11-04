@@ -1,22 +1,21 @@
 import { RiAddLine } from "react-icons/ri";
 import Nav from "../ui/Nav";
 import MenuButton from "./MenuButton";
-import ChatHistoryButton from "../features/Chat/History/ChatHistoryButton";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useChatContext } from "../contexts/ChatContext";
-import Button from "../ui/Button";
-import { TiThMenu } from "react-icons/ti";
 import { FaAngleDown } from "react-icons/fa";
 import { DialogButton } from "../ui/Dialog";
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
 import ChatRenamingModel from "../features/Chat/History/ChatRenamingModal";
 import DeleteButton from "./DeleteButton";
+import { useSidebar } from "../contexts/SidebarContext";
 
 const ChatNav: React.FC<{}> = ({}) => {
   const location = useLocation();
   const isChatNew = location.pathname.includes("chat/new")
   const { chatId } = useParams();
   const { getChatInfo, deleteChatById } = useChatContext();
+  const { isCollapsed } = useSidebar();
   const navigate = useNavigate();
 
   const chatInfo = getChatInfo(Number(chatId));
@@ -30,17 +29,7 @@ const ChatNav: React.FC<{}> = ({}) => {
 
 
   return (
-    <Nav>
-      <div>
-        <MenuButton className="bg-slate-800 hover:text-yellow-300 text-slate-200"/>
-        <ChatHistoryButton className="bg-slate-800 hover:text-yellow-300 text-slate-200"/>
-        {
-          !isChatNew && 
-            <Link to={`/chat/new`} className="bg-slate-800 text-slate-200 hover:text-yellow-300 px-2 no-underline inline-block">
-              <RiAddLine />
-            </Link>
-        } 
-      </div>
+    <Nav isFull={!isCollapsed}>
       {
         chatInfo && 
           <div className="grid-row-6 flex justify-self-center items-center text-slate-200 gap-2">
@@ -63,9 +52,15 @@ const ChatNav: React.FC<{}> = ({}) => {
           </div>
       }
 
-      <Button className="bg-slate-800 text-slate-200">
-        <TiThMenu />
-      </Button>
+      <div>
+        <MenuButton className="bg-slate-800 hover:text-yellow-300 text-slate-200"/>
+        {
+          !isChatNew && 
+            <Link to={`/chat/new`} className="bg-slate-800 text-slate-200 hover:text-yellow-300 px-2 no-underline inline-block">
+              <RiAddLine />
+            </Link>
+        } 
+      </div>
     </Nav>
   )
 }

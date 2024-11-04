@@ -59,20 +59,38 @@
 }
 
 
-@keyframes logo-spin {
+@keyframes slide-in {
   from {
-    transform: rotate(0deg);
+    transform: translateX(-100%);
+    opacity: 0;
   }
+
   to {
-    transform: rotate(360deg);
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
   }
 }
+
+.sidebar-in {
+  animation: slide-in 300ms forwards;
+}
+
+.sidebar-out {
+  animation: slide-out 300ms forwards;
+}
+
 
 .card {
   padding: 2em;

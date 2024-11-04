@@ -33,14 +33,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
     }
   };
 
-  const handleFileAdd = (files: File[]) => {
-    console.log("files added", files);
-  }
-
-
-
   return (
-    <div className="relative w-[60%] mx-auto mb-20">
+    <div className="relative w-full mx-auto mb-20">
       <form onSubmit={handleSubmit}>
         <Textarea id="MesasgeInput" onFocus={onFocus} onBlur={onBlur}>
           <label
@@ -57,7 +51,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
           <MessageActions isFocus={isFocus} />
           <ModelSelector /> 
         </Textarea>
-         
       </form>  
     </div>
   );

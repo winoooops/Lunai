@@ -5,14 +5,17 @@ import { ChatItem } from "../../../types/Chat";
 import { useChatContext } from "../../../contexts/ChatContext";
 import ChatLink from "./ChatLink";
 import { useNavigate } from "react-router-dom";
-import { useDialog } from "../../../contexts/DialogContext";
+import Button from "../../../ui/Button";
+import { RiSidebarUnfoldLine } from "react-icons/ri";
+import { useSidebar } from "../../../contexts/SidebarContext";
 
 
 const ChatHistory: React.FC<{}> = ({}) => {
   const { chats: chatEntries } = useChatContext();
-  const { closeDialog } = useDialog();
+  const { toggleCollapse } = useSidebar();
   const [filtedEntries, setFilteredEntries] = useState(chatEntries);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     setFilteredEntries(chatEntries);
@@ -41,12 +44,16 @@ const ChatHistory: React.FC<{}> = ({}) => {
   
   const handleSelect = (id: number) => {
     navigate(`/chat/${id}`);
-    closeDialog();
   }
 
   return (
-    <div className="bg-slate-900 rounded-lg text-slate-200 p-4 mt-2 w-[25em]">
-      <h2 className="text-xs text-bold mb-4 font-semibold">All Chats</h2>
+    <div className="bg-slate-900 rounded-lg text-slate-200 p-4 mt-2 h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xs text-bold font-semibold">All Chats</h2>
+        <Button className="bg-transparent hover:bg-slate-800" onClick={toggleCollapse}>
+          <RiSidebarUnfoldLine /> 
+        </Button>
+      </div>
       <SearchBar onSearch={onSearch} placeholder="Search chats..."/>
       <div>
         {
@@ -59,7 +66,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
               <div key={section} className="mb-4">
                 <h3 className="text-sm text-slate-500">{section}</h3>
                 {groupedEntries[section].map((entry:ChatItem) => (
-                  <ChatLink chatItem={entry} onSelect={handleSelect}/>                  
+                  <ChatLink key={entry.id} chatItem={entry} onSelect={handleSelect}/>                  
                 ))}
               </div>  
             ))

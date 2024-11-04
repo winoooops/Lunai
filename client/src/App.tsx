@@ -8,11 +8,13 @@ import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
 import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { ChatContextProvider } from './contexts/ChatContext'
+import { SidebarProvider } from './contexts/SidebarContext'
 
 function App() {
   return (
     <UIContextProvider>
     <DialogProvider>  
+    <SidebarProvider>
     <DnDContextProvider>
     <ChatContextProvider>  
       <Router>
@@ -29,6 +31,7 @@ function App() {
       </Router>  
     </ChatContextProvider>
     </DnDContextProvider>  
+    </SidebarProvider>
     </DialogProvider>
     </UIContextProvider>
   )
