@@ -7,6 +7,7 @@ import useMouseNearEdge from '../hooks/useMouseNearEdge';
 import { useSidebar } from '../contexts/SidebarContext';
 import ChatHistory from '../features/Chat/History/ChatHistory';
 import { RiSidebarUnfoldLine } from 'react-icons/ri';
+import ChatSidebarWrapper from '../features/Chat/History/ChatSidebarWrapper';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const { sidebars, leftSidebar, openSidebar } = useSidebar();
 	const [isHighlight, setIsHighlight] = useState<boolean>(false);
 
-	useMouseNearEdge(!leftSidebar || !leftSidebar.isOpened, 50, () => openSidebar("left", <ChatHistory />));
+	useMouseNearEdge(!leftSidebar || !leftSidebar.isOpened, 50, () => openSidebar("left", "left", <ChatSidebarWrapper><ChatHistory /></ChatSidebarWrapper>));
 	// add gradient color for ux 
 	useMouseNearEdge(true, 100, () => setIsHighlight(true));
 
@@ -33,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 				<div className="w-1/5 relative" onMouseLeave={handleMouseLeave}>
 					{ !leftSidebar?.isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
 					{
-						sidebars && sidebars.map(sidebar => <Sidebar sidebar={sidebar} />)
+						sidebars && sidebars.map(sidebar => <Sidebar key={sidebar.id} sidebar={sidebar} />)
 					}
 
 				</div>

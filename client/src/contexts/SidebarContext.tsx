@@ -6,6 +6,7 @@ export interface SidebarInstance {
   isOpened: boolean;
   isCollapsed: boolean;
   content: React.ReactNode;
+  position: "left" | "right";
 }
 
 
@@ -18,17 +19,17 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const startAnimation = () => setIsAnimating(true);
   const endAnimation = () => setIsAnimating(false);
 
-  const openSidebar = (id: string, content: React.ReactNode) => {
+  const openSidebar = (id: string, position: "left" | "right", content: React.ReactNode) => {
     if(isAnimating) return;
     startAnimation();
 
     setSidebars((prev) => {
       const existingSidebar = prev.find((sidebar) => sidebar.id === id);
       if(existingSidebar) {
-        return prev.map((sidebar) => sidebar.id === id ? {...sidebar, isOpened: true, content} : sidebar)
+        return prev.map((sidebar) => sidebar.id === id ? {...sidebar, isOpened: true, position, content} : sidebar)
       }
 
-      return [...prev, { id, isOpened: true, isCollapsed: true, content }];
+      return [...prev, { id, isOpened: true, isCollapsed: true, position, content }];
     })
   }
 

@@ -46,7 +46,7 @@
 }
 
 
-@keyframes slide-in {
+@keyframes left-in {
   from {
     transform: translateX(-100%);
     opacity: 0;
@@ -58,7 +58,7 @@
   }
 }
 
-@keyframes slide-out {
+@keyframes left-out {
   from {
     transform: translateX(0);
     opacity: 1;
@@ -70,12 +70,12 @@
   }
 }
 
-.sidebar-in {
-  animation: slide-in 300ms forwards;
+.sidebar-left-in {
+  animation: left-in 300ms forwards;
 }
 
-.sidebar-out {
-  animation: slide-out 300ms forwards;
+.sidebar-left-out {
+  animation: left-out 300ms forwards;
 }
 
 .highlight {
