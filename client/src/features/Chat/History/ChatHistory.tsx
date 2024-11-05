@@ -5,14 +5,10 @@ import { ChatItem } from "../../../types/Chat";
 import { useChatContext } from "../../../contexts/ChatContext";
 import ChatLink from "./ChatLink";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../ui/Button";
-import { RiSidebarUnfoldLine } from "react-icons/ri";
-import { useSidebar } from "../../../contexts/SidebarContext";
 
 
 const ChatHistory: React.FC<{}> = ({}) => {
   const { chats: chatEntries } = useChatContext();
-  const { toggleCollapse } = useSidebar();
   const [filtedEntries, setFilteredEntries] = useState(chatEntries);
   const navigate = useNavigate();
 
@@ -47,13 +43,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
   }
 
   return (
-    <div className="bg-slate-900 rounded-lg text-slate-200 p-4 mt-2 h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs text-bold font-semibold">All Chats</h2>
-        <Button className="bg-transparent hover:bg-slate-800" onClick={toggleCollapse}>
-          <RiSidebarUnfoldLine /> 
-        </Button>
-      </div>
+    <>
       <SearchBar onSearch={onSearch} placeholder="Search chats..."/>
       <div>
         {
@@ -72,8 +62,8 @@ const ChatHistory: React.FC<{}> = ({}) => {
             ))
           )
         } 
-      </div>    
-    </div>
+      </div>
+    </>
   );
 }
 

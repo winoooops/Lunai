@@ -29,10 +29,10 @@ const ChatNav: React.FC<{}> = ({}) => {
 
 
   return (
-    <Nav isFull={!isCollapsed}>
+    <Nav>
       {
         chatInfo && 
-          <div className="grid-row-6 flex justify-self-center items-center text-slate-200 gap-2">
+          <div className="grow flex items-center justify-center text-slate-200 gap-2">
             <HiChatBubbleLeftRight  />
             <DialogButton
               id="nav-edit-title"
@@ -52,7 +52,7 @@ const ChatNav: React.FC<{}> = ({}) => {
           </div>
       }
 
-      <div>
+      <div className={`${isCollapsed ? "w-1/3" : ""} flex justify-end items-center`}>
         <MenuButton className="bg-slate-800 hover:text-yellow-300 text-slate-200"/>
         {
           !isChatNew && 

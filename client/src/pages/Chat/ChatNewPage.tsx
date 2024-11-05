@@ -7,7 +7,7 @@ const ChatNewPage: React.FC<{}> = ({ }) => {
   const { onSend } = useMessageContext();
 
   return (
-    <div className="h-full flex flex-col items-center justify-center ">
+    <div className="h-full flex flex-col items-center justify-center px-4 py-6 flex-1">
         <MessageLanding />
         <MessageInput onSendMessage={onSend}/>
         <ChatRecent />
