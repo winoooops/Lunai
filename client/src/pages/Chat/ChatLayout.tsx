@@ -4,7 +4,8 @@ import { useSidebar } from "../../contexts/SidebarContext";
 import ChatNav from "../../components/ChatNav/ChatNav";
 
 const ChatLayout: React.FC<{}> = ({}) => {
-  const { isCollapsed } = useSidebar();
+  const { leftSidebar } = useSidebar();
+  const isCollapsed = leftSidebar ? leftSidebar.isCollapsed ? "mx-auto" : "" : ""; 
 
   return (
     <MessageContextProvider>

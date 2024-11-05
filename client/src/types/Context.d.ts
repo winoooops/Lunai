@@ -1,10 +1,10 @@
+import { SidebarInstance } from "../contexts/SidebarContext";
+
 export interface SidebarContextProps {
-  id: string | undefined;
-  isOpened: boolean;
-  isCollapsed: boolean;
-  content: React.ReactNode | null;
+  sidebars: SidebarInstance[];
+  leftSidebar: SidebarInstance | undefined;
   openSidebar: (id: string, content: React.ReactNode) => void;
-  closeSidebar: () => void;
-  toggleCollapse: () => void;
+  closeSidebar: (id: string) => void;
+  toggleCollapse: (id: string) => void;
   onAnimationEnd: () => void;
 }

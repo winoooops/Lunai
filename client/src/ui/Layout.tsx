@@ -14,10 +14,10 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const { isOpen, content, } = useDialog();
-	const { openSidebar, isOpened } = useSidebar();
+	const { sidebars, leftSidebar, openSidebar } = useSidebar();
 	const [isHighlight, setIsHighlight] = useState<boolean>(false);
 
-	useMouseNearEdge(!isOpened, 50, () => openSidebar("menu", <ChatHistory />));
+	useMouseNearEdge(!leftSidebar || !leftSidebar.isOpened, 50, () => openSidebar("left", <ChatHistory />));
 	// add gradient color for ux 
 	useMouseNearEdge(true, 100, () => setIsHighlight(true));
 
@@ -31,8 +31,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 		>
 			<div className="flex h-full w-full">
 				<div className="w-1/5 relative" onMouseLeave={handleMouseLeave}>
-					{ !isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
-					<Sidebar />
+					{ !leftSidebar?.isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
+					{
+						sidebars && sidebars.map(sidebar => <Sidebar sidebar={sidebar} />)
+					}
+
 				</div>
 				<div className={`flex w-4/5`}>
 					<MainContent>

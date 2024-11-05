@@ -6,7 +6,7 @@ import ChatRenamingModel from "../../features/Chat/History/ChatRenamingModal";
 import { useChatContext } from "../../contexts/ChatContext";
 import { useNavigate } from "react-router-dom";
 
-const ChatNavTitle: React.FC<{isWidthFixed: boolean}> = ({ isWidthFixed }) => {
+const ChatNavTitle: React.FC<{}> = () => {
   const navigate = useNavigate();
   const { getChatInfo, deleteChatById } = useChatContext();
   const chatInfo = getChatInfo();

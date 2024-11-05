@@ -1,14 +1,19 @@
 import React from "react";
-import { useSidebar } from "../contexts/SidebarContext";
+import { SidebarInstance, useSidebar } from "../contexts/SidebarContext";
 import useMouseMoveOutside from "../hooks/useMouseMoveOutside";
 import Button from "./Button";
 import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
 import { TbMoon2 } from "react-icons/tb";
 
-const Sidebar: React.FC = () => {
-  const { isOpened, isCollapsed, content, id, closeSidebar, onAnimationEnd, toggleCollapse } = useSidebar();
+export type SidebarProps = {
+  sidebar: SidebarInstance;
+}
 
-  const { elementRef } = useMouseMoveOutside(isCollapsed, closeSidebar);
+
+const Sidebar: React.FC<SidebarProps> = ({ sidebar }) => {
+  const { id, content, isCollapsed, isOpened } = sidebar;
+  const { closeSidebar, toggleCollapse, onAnimationEnd } = useSidebar();
+  const { elementRef } = useMouseMoveOutside(isCollapsed, () => closeSidebar(id));
 
 
   return (
@@ -20,7 +25,7 @@ const Sidebar: React.FC = () => {
         <div className="grow">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xs text-bold font-semibold">All Chats</h2>
-            <Button className="bg-transparent hover:bg-slate-800" onClick={toggleCollapse}>
+            <Button className="bg-transparent hover:bg-slate-800" onClick={() => toggleCollapse(id)}>
               { 
                 isCollapsed ? <RiSidebarUnfoldLine /> : <RiSidebarFoldLine /> 
               }

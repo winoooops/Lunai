@@ -1,51 +1,62 @@
 import React, { createContext, useContext, useState } from "react";
 import { SidebarContextProps } from "../types/Context";
 
+export interface SidebarInstance {
+  id: string;
+  isOpened: boolean;
+  isCollapsed: boolean;
+  content: React.ReactNode;
+}
+
+
 const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [id, setId] = useState<string | undefined>(undefined);
-  const [isOpened, setIsOpened] = useState<boolean>(false);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-  const [content, setContent] = useState<React.ReactNode>(null);
+  const [sidebars, setSidebars] = useState<SidebarInstance[]>([]);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const startAnimation = () => setIsAnimating(true);
   const endAnimation = () => setIsAnimating(false);
 
-  const openSidebar = (targetId: string, content: React.ReactNode) => {
+  const openSidebar = (id: string, content: React.ReactNode) => {
     if(isAnimating) return;
-
     startAnimation();
-    if(id !== targetId) {
-      setId(id);
-      setContent(content);
-    }
-    setIsOpened(true);
+
+    setSidebars((prev) => {
+      const existingSidebar = prev.find((sidebar) => sidebar.id === id);
+      if(existingSidebar) {
+        return prev.map((sidebar) => sidebar.id === id ? {...sidebar, isOpened: true, content} : sidebar)
+      }
+
+      return [...prev, { id, isOpened: true, isCollapsed: true, content }];
+    })
   }
 
-  const closeSidebar = () => {
+  const closeSidebar = (id: string) => {
     if(isAnimating) return;
 
-    setIsOpened(false);
+    setSidebars((prev) => prev.map((sidebar) => sidebar.id === id ? {...sidebar, isOpened: false} : sidebar));
   }
 
-  const toggleCollapse = () => {
-    isOpened && setIsCollapsed(state => !state);
+  const getSidebar = (id: string): SidebarInstance | undefined => {
+    return sidebars.find((sidebar) => sidebar.id === id);
   }
 
+  const toggleCollapse = (id: string) => {
+    setSidebars((prev) => prev.map((sidebar) => sidebar.id === id ? {...sidebar, isCollapsed: !sidebar.isCollapsed} : sidebar));
+  }
   
   const onAnimationEnd = () => {
     endAnimation();
   }
+
+  const leftSidebar = getSidebar("left");
   
 
   return (
     <SidebarContext.Provider value={{
-      id,
-      isOpened,
-      isCollapsed,
-      content,
+      sidebars,
+      leftSidebar,
       openSidebar,
       closeSidebar,
       toggleCollapse,

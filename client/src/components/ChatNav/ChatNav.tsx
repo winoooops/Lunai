@@ -4,12 +4,14 @@ import ChatNavButtonGroup from "./ChatNavButtonGroup";
 import ChatNavTitle from "./ChatNavTitle";
 
 const ChatNav: React.FC<{}> = ({}) => {
-  const { isCollapsed } = useSidebar();
+  const { leftSidebar } = useSidebar();
+
+  const isWidthFixed = leftSidebar ? leftSidebar?.isCollapsed : true;
 
   return (
     <Nav>
-      <ChatNavTitle isWidthFixed={isCollapsed}/> 
-      <ChatNavButtonGroup isWidthFixed={isCollapsed} />
+      <ChatNavTitle /> 
+      <ChatNavButtonGroup isWidthFixed={isWidthFixed} />
     </Nav>
   )
 }
