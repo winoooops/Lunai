@@ -8,5 +8,5 @@ export interface ChatContextProps {
   chats: Chat[];
   deleteChatById: (id: number) => void;
   editChat: (id: number, payload: Partial<ChatItem>) => void;
-  getChatInfo: (id: number) => ChatItem | undefined;
+  getChatInfo: () => ChatItem | undefined;
 }

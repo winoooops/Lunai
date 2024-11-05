@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { MessageContextProvider } from "../../contexts/MessageContext";
-import ChatNav from "../../components/ChatNav";
 import { useSidebar } from "../../contexts/SidebarContext";
+import ChatNav from "../../components/ChatNav/ChatNav";
 
 const ChatLayout: React.FC<{}> = ({}) => {
   const { isCollapsed } = useSidebar();

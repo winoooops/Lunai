@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { ChatContextProps, ChatItem } from "../types/Chat";
+import { useParams } from "react-router-dom";
 
 const items: ChatItem[] = [
     {title: "I need help with my tax", id: 1, timestamp: new Date(Date.now() - 1000 * 60 * 10)},
@@ -21,8 +22,9 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setChats((prev) => prev.map((chat:ChatItem) => chat.id === id ? {...chat, ...payload} : chat));
   }
 
-  const getChatInfo = (id: number): ChatItem | undefined => {
-    return chats.find((chat) => chat.id === id);
+  const getChatInfo = (): ChatItem | undefined => {
+    const { chatId } = useParams();
+    return chats.find((chat) => chat.id === Number(chatId));
   }
 
   return (
