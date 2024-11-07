@@ -5,12 +5,12 @@ import ChatNav from "../../components/ChatNav/ChatNav";
 
 const ChatLayout: React.FC<{}> = ({}) => {
   const { leftSidebar } = useSidebar();
-  const isCollapsed = leftSidebar ? leftSidebar.isCollapsed ? "mx-auto" : "" : ""; 
+  const isCollapsed = leftSidebar && leftSidebar.isCollapsed; 
 
   return (
     <MessageContextProvider>
       <ChatNav />
-      <div className={`w-3/4 h-full ${isCollapsed ? "" : "mx-auto"}`}>
+      <div className={`w-3/4 h-full ${isCollapsed ? "" : leftSidebar ?  "mx-auto": ""}`}>
         <Outlet />
       </div>
     </MessageContextProvider>
