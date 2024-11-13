@@ -15,12 +15,12 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const { isOpen, content, } = useDialog();
-	const { sidebars, leftSidebar, openSidebar } = useSidebar();
+	const { leftSidebar, openSidebar } = useSidebar();
 	const [isHighlight, setIsHighlight] = useState<boolean>(false);
 
 	useMouseNearEdge(!leftSidebar || !leftSidebar.isOpened, 50, () => openSidebar("left", "left", <ChatSidebarWrapper><ChatHistory /></ChatSidebarWrapper>));
 	// add gradient color for ux 
-	useMouseNearEdge(true, 100, () => setIsHighlight(true));
+	useMouseNearEdge(true, window.innerWidth * 0.2, () => setIsHighlight(true));
 
 	const handleMouseLeave = () => setIsHighlight(false);
 
@@ -28,15 +28,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 		<div 
 			onDrop={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
 			onDragOver={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
-			className={`flex flex-col bg-slate-800 dark:bg-[#252423] h-full w-full overflow-hidden justify-items-center ${isHighlight ? "highlight" : ""}`}
+			className={`flex bg-slate-800 flex-col h-full w-full overflow-hidden justify-items-center ${isHighlight ? "bg-bg-gradient" : ""}`}
 		>
 			<div className="flex h-full w-full">
-				<div className="w-1/5 relative" onMouseLeave={handleMouseLeave}>
+				<div className="w-1/5 relative h-screen flex" onMouseLeave={handleMouseLeave}>
 					{ !leftSidebar?.isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
-					{
-						sidebars && sidebars.map(sidebar => <Sidebar key={sidebar.id} sidebar={sidebar} />)
-					}
-
+					{ leftSidebar && <Sidebar sidebar={leftSidebar} /> }
 				</div>
 				<div className={`flex w-4/5`}>
 					<MainContent>

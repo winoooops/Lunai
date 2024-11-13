@@ -6,6 +6,13 @@ module.exports = {
     "./node_modules/tw-elements/js/**/*.js",
   ],
   theme: {
+    borderWidth: {
+      DEFAULT: "1px",
+      "0": "0",
+      "0.5": ".5px",
+      "2": "2px",
+      "4": "4px"
+    },
     extend: {},
   },
   darkMode: "class",

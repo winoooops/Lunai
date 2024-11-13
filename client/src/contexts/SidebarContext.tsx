@@ -52,12 +52,14 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }
 
   const leftSidebar = getSidebar("left");
+  const rightSidebar = getSidebar("right");
   
 
   return (
     <SidebarContext.Provider value={{
       sidebars,
       leftSidebar,
+      rightSidebar,
       openSidebar,
       closeSidebar,
       toggleCollapse,

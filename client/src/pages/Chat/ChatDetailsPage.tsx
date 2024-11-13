@@ -19,25 +19,27 @@ const ChatDetailsPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 w-full overflow-y-auto px-4 py-6">
-        {messages.length === 0 ? (
-          <MessageLanding />
-        ) : (
-          messages.map((message, index) => (
-            <MessageBubble
-              key={index}
-              isUser={message.isUser}
-              content={message.content}
-            />
-          ))
-        )}
-      </div>
-      <div className="w-full px-4 py-4">
-        {
-          shouldShowFiles && <MessageFiles />
-        }
-        <MessageInput onSendMessage={onSend} />
+    <div className='h-full flex'>
+      <div className="flex flex-col h-full flex-1">
+        <div className="flex-1 w-full overflow-y-auto px-4 py-6">
+          {messages.length === 0 ? (
+            <MessageLanding />
+          ) : (
+            messages.map((message, index) => (
+              <MessageBubble
+                key={index}
+                isUser={message.isUser}
+                content={message.content}
+              />
+            ))
+          )}
+        </div>
+        <div className="w-full px-4 py-4">
+          {
+            shouldShowFiles && <MessageFiles />
+          }
+          <MessageInput onSendMessage={onSend} />
+        </div>
       </div>
     </div>
   );
