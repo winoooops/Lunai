@@ -40,6 +40,7 @@ export const promptForTextReply = async (text: string) => {
   }
   catch (error){
     console.error("error details", error);
+    console.error(error);
     throw new Error("Failed to call Anthropic API");
   }
 }
