@@ -19,17 +19,19 @@ const ChatNavButtonGroup: React.FC<{isWidthFixed: boolean}> = ({ isWidthFixed })
 
   return (
     <div className={`${isWidthFixed ? "w-1/3" : ""} flex justify-end items-center`}>
-      <Button className="bg-slate-800 hover:text-yellow-300 text-slate-200">
-        <AiOutlineControl onClick={handleClick}/>
-      </Button>  
       {
-        !isChatNew && 
+        !isChatNew && <>
+          <Button className="bg-slate-800 hover:text-yellow-300 text-slate-200">
+            <AiOutlineControl onClick={handleClick}/>
+          </Button>
+
           <Link to={`/chat/new`} className="bg-slate-800 text-yellow-200 hover:text-yellow-500 px-2 no-underline inline-block">
             <RiChatNewLine  />
           </Link>
-      } 
+        </>
+        }
     </div>   
-  );
-}
+    );
+  }
 
-export default ChatNavButtonGroup;
+  export default ChatNavButtonGroup;
