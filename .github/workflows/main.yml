@@ -1,0 +1,70 @@
+name: Deploy Lunai Server to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Install Node.js
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+
+      # Install dependencies for the server
+      - name: Install server dependencies
+        run: |
+          cd server
+          npm install
+      
+      # Deploy to server
+      - name: Deploy to server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          # Private key
+          SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          # SCP
+          ARGS: '-avzr'
+          # Server IP
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          # User
+          REMOTE_USER: 'root'
+          # Target directory on the server
+          TARGET: "/root/lunai"
+
+      # Execute remote SSH commands to start the server
+      - name: Executing remote SSH commands to start the server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            whoami
+            ls -la
+            cd /root/lunai/server
+            # Function to kill process running on a specific port
+            kill_port() {
+              PORT=$1
+              PID=$(lsof -t -i:$PORT)
+              if [ -n "$PID" ]; then
+                echo "Killing process $PID running on port $PORT"
+                kill -9 $PID
+              else
+                echo "No process running on port $PORT"
+              fi
+            }
+            # Kill process running on the specified port
+            kill_port ${{ secrets.REMOTE_PORT }}
+            # Start the application in the background
+            nohup npm run start > output.log 2>&1 &
