@@ -9,7 +9,8 @@ This project is a backend service for an AI chatbot application built using Node
 │ ├── index.ts # Entry point of the application
 │ ├── resolvers/ # GraphQL resolvers
 │ │ ├── chatResolvers.ts # Resolvers for chat-related queries and mutations
-│ │ └── configResolvers.ts # Resolvers for configuration-related queries and mutations
+│ │ └── configResolvers.ts # Resolvers for config:w
+uration-related queries and mutations
 │ ├── schemas/ # GraphQL schemas
 │ │ ├── chatSchema.ts # Schema for chat-related types
 │ │ └── configSchema.ts # Schema for configuration-related types
@@ -36,6 +37,8 @@ This project is a backend service for an AI chatbot application built using Node
    ```
    ANTHROPIC_API_KEY = "your-api-key-here"
    ``` 
+
+   optionally, you could also use [Grok Free API](https://x.ai/api) for the prompt. In this case you need to update the `XAI_API_KEY` with your api key and edit the `ANTHROPIC_BASE_URL` to "" 
 
 3. **Run the application:**
    ```bash
