@@ -4,7 +4,7 @@ import { Message } from "@/types/message";
 import { BaseAIService } from "./AIService";
 
 
-export class XAIService implements BaseAIService {
+class XAIService implements BaseAIService {
   client: AxiosInstance;
   model: string;
 
@@ -55,3 +55,5 @@ export class XAIService implements BaseAIService {
     
   }
 }
+
+export default XAIService;

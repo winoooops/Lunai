@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
 
 
-export class AnthropicService implements BaseAIService {
+class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
 
   constructor(apiKey: string, baseURL?: string) {
@@ -40,3 +40,5 @@ export class AnthropicService implements BaseAIService {
     }
   }
 }
+
+export default AnthropicService;
