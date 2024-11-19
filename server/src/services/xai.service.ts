@@ -1,15 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { config } from "dotenv";
-import { promptForTextReply } from "./messages.service";
 import { XAICompletionParams, XAICompletionResponse } from "@/types/xai";
 import { Message } from "@/types/message";
+import { BaseAIService } from "./AIService";
 
-config();
 
-const XAI_API_KEY = process.env.XAI_API_KEY;
-const BASE_URL = process.env.XAI_BASE_URL;
-
-export class XAIService {
+export class XAIService implements BaseAIService {
   client: AxiosInstance;
   model: string;
 

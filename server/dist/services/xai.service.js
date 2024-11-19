@@ -1,8 +1,4 @@
 import axios from "axios";
-import { config } from "dotenv";
-config();
-const XAI_API_KEY = process.env.XAI_API_KEY;
-const BASE_URL = process.env.XAI_BASE_URL;
 export class XAIService {
     constructor(apiKey, baseURL, model) {
         this.client = axios.create({

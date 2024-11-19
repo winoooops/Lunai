@@ -1,8 +1,9 @@
 import { Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
+import { BaseAIService } from "./AIService";
 
 
-export class AnthropicService {
+export class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
 
   constructor(apiKey: string, baseURL?: string) {

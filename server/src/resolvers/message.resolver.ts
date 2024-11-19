@@ -1,4 +1,4 @@
-import { promptForTextReply } from "@/services/messages.service";
+import { MessageHandler } from "@/handlers/messageHandler";
 import { Message } from "../types/message";
 
 export const messageResolvers = {
@@ -7,7 +7,7 @@ export const messageResolvers = {
   },
   Mutation:{
     getTextPrompt: async (_: any, { prompt } : { prompt: string} ): Promise<Message> => {
-      return await promptForTextReply(prompt);
+      return await MessageHandler.promptForTextReply(prompt);
     }  
   }
 }
