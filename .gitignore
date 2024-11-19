@@ -6,3 +6,9 @@
 
 # Ignore .env file
 /server/.env
+
+# Ignore built folder
+/server/dist
+
+# Ignore .vscode settting
+.vscode
