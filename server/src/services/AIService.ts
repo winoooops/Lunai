@@ -1,8 +1,8 @@
 import { config } from 'dotenv';
 
 import { Message } from "@/types/message";
-import AnthropicService from './Anthropic.service';
-import XAIService from './Xai.service';
+import AnthropicService from './anthropic.service';
+import XAIService from './xai.service';
 
 config();
 
