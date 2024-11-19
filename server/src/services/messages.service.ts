@@ -23,7 +23,7 @@ const anthropic = new AnthropicService(API_KEY, ANTHROPIC_BASE_URL);
 const xai = new XAIService(API_KEY, BASE_URL);
 
 
-export const promptForTextReply = async (text: string) => {
+export const promptForTextReply = (text: string) => {
   try {
     if(ANTHROPIC_BASE_URL) {
       return anthropic.promptForTextReply(text);

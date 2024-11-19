@@ -6,8 +6,8 @@ export const messageResolvers = {
     messages: []
   },
   Mutation:{
-    getTextPrompt: (prompt: string): Promise<Message> => {
-      return promptForTextReply(prompt);
+    getTextPrompt: async (_: any, { prompt } : { prompt: string} ): Promise<Message> => {
+      return await promptForTextReply(prompt);
     }  
   }
 }
