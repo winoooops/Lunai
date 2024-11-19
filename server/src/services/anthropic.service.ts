@@ -1,46 +1,27 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { TextContentBlock } from "../types/message";
-import { config } from "dotenv";
 
-config();
 
-const API_KEY = process.env.ANTHROPIC_API_KEY;
+export class AnthropicService {
+  anthropicInstance: Anthropic;
 
-if(!API_KEY) {
-  throw new Error("Failed to get API_KEY for Anthropic API key, plz check your .env file");
-}
+  constructor(apiKey: string, baseURL?: string) {
+    this.anthropicInstance = new Anthropic({
+      apiKey,
+      baseURL
+    })
+  }
 
-const anthropic = new Anthropic();
-
-export const promptForTextReply = async (text: string) => {
-  try {
-    const msg = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 1000,
-      temperature: 0,
-      system: "Respond only with short poems.",
+  promptForTextReply(content: string) {
+    return this.anthropicInstance.messages.create({
+      model: "grok-beta",
+      max_tokens: 128,
+      system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
       messages: [
         {
-          "role": "user",
-          "content": [
-            {
-              type: "text",
-              text
-            }
-          ]
+          role: "user",
+          content
         }
       ]
-    });
-
-    return {
-      id: msg.id,
-      content: msg.content as TextContentBlock[],
-      role: msg.role
-    };
-  }
-  catch (error){
-    console.error("error details", error);
-    console.error(error);
-    throw new Error("Failed to call Anthropic API");
+    })
   }
 }
