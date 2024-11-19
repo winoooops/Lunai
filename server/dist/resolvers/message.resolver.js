@@ -1,4 +1,4 @@
-import { promptForTextReply } from "../services/anthropic.service";
+import { promptForTextReply } from "../services/messages.service";
 export const messageResolvers = {
     Query: {
         messages: []

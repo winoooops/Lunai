@@ -5,8 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "compile": "tsc",
-    "start": "tsc && node --trace-warnings --experimental-specifier-resolution=node dist/index.js"
+    "compile": "tsc && tsc-alias",
+    "start": "tsc && tsc-alias && node --trace-warnings --experimental-specifier-resolution=node dist/index.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
@@ -19,5 +19,8 @@
     "graphql": "^16.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "tsc-alias": "^1.8.10"
   }
 }

@@ -1,37 +1,34 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { config } from "dotenv";
-config();
-const API_KEY = process.env.ANTHROPIC_API_KEY;
-if (!API_KEY) {
-    throw new Error("Failed to get API_KEY for Anthropic API key, plz check your .env file");
-}
-const anthropic = new Anthropic();
-export const promptForTextReply = async (text) => {
-    try {
-        const msg = await anthropic.messages.create({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 1000,
-            temperature: 0,
-            system: "Respond only with short poems.",
-            messages: [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            type: "text",
-                            text
-                        }
-                    ]
-                }
-            ]
+export class AnthropicService {
+    constructor(apiKey, baseURL) {
+        this.anthropicInstance = new Anthropic({
+            apiKey,
+            baseURL
         });
-        return {
-            id: msg.id,
-            content: msg.content,
-            role: msg.role
-        };
     }
-    catch (error) {
-        throw new Error("Failed to call Anthropic API");
+    async promptForTextReply(content) {
+        try {
+            const response = await this.anthropicInstance.messages.create({
+                model: "grok-beta",
+                max_tokens: 128,
+                system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
+                messages: [
+                    {
+                        role: "user",
+                        content
+                    }
+                ]
+            });
+            const message = {
+                id: response.id,
+                content: response.content,
+                role: response.role
+            };
+            return message;
+        }
+        catch (error) {
+            console.error("Error when calling Anthropic message prompt: ", error);
+            throw new Error("Error when calling Anthropic message prompt");
+        }
     }
-};
+}
