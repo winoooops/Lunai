@@ -1,4 +1,4 @@
-import { Message } from "@/types/message";
+import { LunaiMessage, Message } from "@/types/message";
 import { BaseAIService, getAIService } from "@/services/AIService";
 
 
@@ -11,9 +11,9 @@ export class MessageHandler {
    * @returns {Promise<Message>} A promise that resolves a Message object 
    * @throws {Error}
    */
-  static promptForTextReply(text: string): Promise<Message> {
+  static createTextReplyFromConversation(messages: LunaiMessage[]): Promise<Message> {
     try {
-      return this.aiService.promptForTextReply(text);
+      return this.aiService.createTextReplyFromConversation(messages);
     }
     catch (error){
       console.error(error);

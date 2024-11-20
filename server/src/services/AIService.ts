@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 
-import { Message } from "@/types/message";
+import { LunaiMessage, Message } from "@/types/message";
 import AnthropicService from './anthropic.service';
 import XAIService from './xai.service';
 
@@ -15,7 +15,7 @@ if(!API_KEY) {
 }
 
 export interface BaseAIService {
-  promptForTextReply(text: string): Promise<Message>;
+  createTextReplyFromConversation(messages: LunaiMessage[]): Promise<Message>;
 }
 
 export const getAIService = (): BaseAIService => {

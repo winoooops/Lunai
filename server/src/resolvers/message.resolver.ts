@@ -1,13 +1,13 @@
 import { MessageHandler } from "@/handlers/messageHandler";
-import { Message } from "../types/message";
+import { LunaiMessage, Message } from "../types/message";
 
 export const messageResolvers = {
   Query: {
     messages: []
   },
   Mutation:{
-    getTextPrompt: async (_: any, { prompt } : { prompt: string} ): Promise<Message> => {
-      return await MessageHandler.promptForTextReply(prompt);
+    getTextPrompt: async (_: any, { messages } : { messages: LunaiMessage[]} ): Promise<Message> => {
+      return await MessageHandler.createTextReplyFromConversation(messages);
     }  
   }
 }

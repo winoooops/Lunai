@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-import { XAICompletionParams, XAICompletionResponse } from "@/types/xai";
-import { Message } from "@/types/message";
+import { XAICompletionChoice, XAICompletionParams, XAICompletionResponse } from "@/types/xai";
+import { LunaiMessage, Message } from "@/types/message";
 import { BaseAIService } from "./AIService";
 
 
@@ -20,19 +20,10 @@ class XAIService implements BaseAIService {
     this.model = model || "grok-beta";
   }
 
-  async promptForTextReply(content: string): Promise<Message> {
+  async createTextReplyFromConversation(messages: LunaiMessage[]): Promise<Message> {
     try {
       const response = await this.client.post<XAICompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
-        messages: [
-          {
-            role: "system",
-            content: "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
-          },
-          {
-            role: "user",
-            content
-          }
-        ],
+        messages,
         model: this.model,
         stream: false,
         temperature: 0
@@ -40,7 +31,7 @@ class XAIService implements BaseAIService {
 
       const message: Message = {
         id: response.data.id,
-        content: response.data.choices.map((choice) => ({
+        content: response.data.choices.map((choice: XAICompletionChoice) => ({
           type: "text",
           text: choice.message.content
         })),

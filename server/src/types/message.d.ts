@@ -9,3 +9,10 @@ export interface Message {
   content: TextContentBlock[];
   role: string;
 }
+
+export type LunaiTextContent = string;
+
+export interface LunaiMessage {
+  content: LunaiTextContent;
+  role: "user" | "assistant";
+}

@@ -1,4 +1,4 @@
-import { Message, TextContentBlock } from "@/types/message";
+import { LunaiMessage, Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
 
@@ -13,18 +13,13 @@ class AnthropicService implements BaseAIService {
     })
   }
 
-  async promptForTextReply(content: string) {
+  async createTextReplyFromConversation(messages: LunaiMessage[]) {
     try {
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
         max_tokens: 128,
         system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-        messages: [
-          {
-            role: "user",
-            content
-          }
-        ]
+        messages 
       })
   
       const message: Message = {

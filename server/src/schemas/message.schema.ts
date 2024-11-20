@@ -1,12 +1,6 @@
 export const MessageSchema = `#graphql
-  type TextContentBlock {
-    text: String!
-    type: String!
-  }
-
-  type Message {
-    id: String!
-    content: [TextContentBlock] 
+  type LunaiMessage {
+    content: String! 
     role: String!
   }
 
@@ -15,6 +9,6 @@ export const MessageSchema = `#graphql
   }
 
   type Mutation {
-    getTextPrompt(prompt: String!): Message
+    createTextReplyFromConversation(messages: [LunaiMessage]!): Message
   }
 `
