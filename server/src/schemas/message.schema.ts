@@ -9,6 +9,6 @@ export const MessageSchema = `#graphql
   }
 
   type Mutation {
-    createTextReplyFromConversation(messages: [LunaiMessage]!): Message
+    createTextReplyFromConversation(messages: [LunaiMessage]!): LunaiMessage
   }
 `
