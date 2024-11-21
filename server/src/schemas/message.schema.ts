@@ -5,7 +5,6 @@ export const MessageSchema = `#graphql
   }
 
   type Message {
-    id: String!
     content: [TextContentBlock] 
     role: String!
   }
@@ -16,13 +15,13 @@ export const MessageSchema = `#graphql
   }
 
   input MessageInput {
-    id: String!
     content: [TextContentBlockInput]
     role: String!
   }
 
   type Query {
     messages: [Message]
+    messagesFromChat(chatId: String!): [Message]
   }
 
   type Mutation {

@@ -1,4 +1,4 @@
-import { LunaiMessage, Message, TextContentBlock } from "@/types/message";
+import { Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
@@ -24,7 +24,6 @@ class AnthropicService implements BaseAIService {
       })
   
       const message: Message = {
-        id: response.id,
         content: response.content as TextContentBlock[],
         role: response.role
       }

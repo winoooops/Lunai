@@ -39,7 +39,6 @@ class XAIService implements BaseAIService {
       });
 
       const message: Message = {
-        id: response.data.id,
         content: response.data.choices.map((message) => ({
           type: "text",
           text: message.message.content
@@ -49,10 +48,9 @@ class XAIService implements BaseAIService {
 
       return message;
     } catch (error) {
-      console.error("Error calling XAIService.promptForTextReply: ", error);
-      throw new Error(`Error calling XAIService.promptForTextReply: ${error}`);
+      console.error("Error calling XAIService.createTextReplyFromConversation: ", error);
+      throw new Error(`Error calling XAIService.createTextReplyFromConversation: ${error}`);
     }
-    
   }
 }
 

@@ -9,9 +9,20 @@ import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { ChatContextProvider } from './contexts/ChatContext'
 import { SidebarProvider } from './contexts/SidebarContext'
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
+
+const client = new ApolloClient(
+  {
+    uri: "https://45.32.66.110:4000",
+    cache: new InMemoryCache()
+  }
+)
+
+
 
 function App() {
   return (
+    <ApolloProvider client={client}>
     <UIContextProvider>
     <DialogProvider>  
     <SidebarProvider>
@@ -34,6 +45,7 @@ function App() {
     </SidebarProvider>
     </DialogProvider>
     </UIContextProvider>
+    </ApolloProvider>
   )
 }
 

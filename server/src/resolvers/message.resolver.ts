@@ -3,7 +3,10 @@ import { Message } from "../types/message";
 
 export const messageResolvers = {
   Query: {
-    messages: []
+    messages: [],
+    messagesFromChat: (chatId: string): Message[] => {
+      return [];
+    }
   },
   Mutation:{
     createTextReplyFromConversation: async (_: any, { messages } : { messages: Message[]} ): Promise<Message> => {
