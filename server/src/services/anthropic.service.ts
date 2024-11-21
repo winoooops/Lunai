@@ -1,6 +1,7 @@
 import { Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
+import { MessageParam } from "@anthropic-ai/sdk/resources";
 
 
 class AnthropicService implements BaseAIService {
@@ -13,18 +14,13 @@ class AnthropicService implements BaseAIService {
     })
   }
 
-  async promptForTextReply(content: string) {
+  async createTextReplyFromConversation(messages: Message[]) {
     try {
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
         max_tokens: 128,
         system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-        messages: [
-          {
-            role: "user",
-            content
-          }
-        ]
+        messages: (messages as MessageParam[]), 
       })
   
       const message: Message = {

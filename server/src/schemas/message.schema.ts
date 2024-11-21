@@ -10,11 +10,22 @@ export const MessageSchema = `#graphql
     role: String!
   }
 
+  input TextContentBlockInput {
+    text: String!
+    type: String!
+  }
+
+  input MessageInput {
+    id: String!
+    content: [TextContentBlockInput]
+    role: String!
+  }
+
   type Query {
     messages: [Message]
   }
 
   type Mutation {
-    getTextPrompt(prompt: String!): Message
+    createTextReplyFromConversation(messages: [MessageInput]!): Message
   }
 `

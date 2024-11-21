@@ -20,7 +20,7 @@ class XAIService implements BaseAIService {
     this.model = model || "grok-beta";
   }
 
-  async promptForTextReply(content: string): Promise<Message> {
+  async createTextReplyFromConversation(messages: Message[]): Promise<Message> {
     try {
       const response = await this.client.post<XAICompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
         messages: [
@@ -28,10 +28,10 @@ class XAIService implements BaseAIService {
             role: "system",
             content: "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
           },
-          {
-            role: "user",
-            content
-          }
+          ...messages.map(message => ({
+            role: message.role,
+            content: message.content[0].text
+          })) 
         ],
         model: this.model,
         stream: false,
@@ -40,9 +40,9 @@ class XAIService implements BaseAIService {
 
       const message: Message = {
         id: response.data.id,
-        content: response.data.choices.map((choice) => ({
+        content: response.data.choices.map((message) => ({
           type: "text",
-          text: choice.message.content
+          text: message.message.content
         })),
         role: response.data.choices[0].message.role       
       }

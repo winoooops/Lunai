@@ -11,9 +11,9 @@ export class MessageHandler {
    * @returns {Promise<Message>} A promise that resolves a Message object 
    * @throws {Error}
    */
-  static promptForTextReply(text: string): Promise<Message> {
+  static createTextReplyFromConversation(messages: Message[]): Promise<Message> {
     try {
-      return this.aiService.promptForTextReply(text);
+      return this.aiService.createTextReplyFromConversation(messages);
     }
     catch (error){
       console.error(error);
