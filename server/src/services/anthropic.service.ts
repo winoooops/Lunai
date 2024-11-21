@@ -1,4 +1,4 @@
-import { Message, TextContentBlock } from "@/types/message";
+import { LunaiMessage, Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
