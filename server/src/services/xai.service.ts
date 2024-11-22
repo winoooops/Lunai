@@ -2,22 +2,25 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { XAICompletionParams, XAICompletionResponse } from "@/types/xai";
 import { Message } from "@/types/message";
 import { BaseAIService } from "./AIService";
+import { MessageService } from "./message.service";
 
 
 class XAIService implements BaseAIService {
-  client: AxiosInstance;
+  private client: AxiosInstance;
+  private messageService: MessageService;
   model: string;
 
-  constructor(apiKey: string, baseURL?: string, model?: string) {
+  constructor(apiKey: string, messageService: MessageService, baseURL?: string, model?: string) {
     this.client = axios.create({
       baseURL: baseURL ? baseURL : "https://api.x.ai/v1",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       }
-    }) 
+    });
 
     this.model = model || "grok-beta";
+    this.messageService = messageService; 
   }
 
   async createTextReplyFromConversation(messages: Message[]): Promise<Message> {
@@ -45,6 +48,8 @@ class XAIService implements BaseAIService {
         })),
         role: response.data.choices[0].message.role       
       }
+
+      this.messageService.addMessage(message);
 
       return message;
     } catch (error) {

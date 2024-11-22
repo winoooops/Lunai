@@ -2,16 +2,19 @@ import { Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
+import { MessageService } from "./message.service";
 
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
+  private messageService: MessageService;
 
-  constructor(apiKey: string, baseURL?: string) {
+  constructor(apiKey: string, messageService: MessageService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
       apiKey,
       baseURL
-    })
+    });
+    this.messageService = messageService;
   }
 
   async createTextReplyFromConversation(messages: Message[]) {
@@ -27,6 +30,8 @@ class AnthropicService implements BaseAIService {
         content: response.content as TextContentBlock[],
         role: response.role
       }
+
+      this.messageService.addMessage(message);
   
       return message;
     } catch (error) {

@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import { Message } from "@/types/message";
 import AnthropicService from './anthropic.service';
 import XAIService from './xai.service';
+import { MessageService } from './message.service';
 
 config();
 
@@ -20,8 +21,8 @@ export interface BaseAIService {
 
 export const getAIService = (): BaseAIService => {
   if(ANTHROPIC_BASE_URL) {
-    return new AnthropicService(API_KEY, ANTHROPIC_BASE_URL);
+    return new AnthropicService(API_KEY, MessageService.getInstance(), ANTHROPIC_BASE_URL);
   } 
 
-  return new XAIService(API_KEY, BASE_URL);
+  return new XAIService(API_KEY, MessageService.getInstance(), BASE_URL);
 }
