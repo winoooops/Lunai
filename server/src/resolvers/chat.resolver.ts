@@ -17,9 +17,9 @@ export const chatResolvers = {
       const chatService = ChatService.getInstance();
       return chatService.createChat(input);
     },
-    updateChat(_: any, { id, payload } : { id: string, payload: Partial<Chat>}) {
+    updateChat(_: any, { id, input } : { id: string, input: Partial<Chat>}) {
       const chatService = ChatService.getInstance();
-      return chatService.updateChat(id, payload);
+      return chatService.updateChat(id, input);
     },
     deleteChat(_: any, { id } : { id: string }) {
       const chatService = ChatService.getInstance();

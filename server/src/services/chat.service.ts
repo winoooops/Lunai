@@ -48,6 +48,7 @@ export class ChatService {
     }
 
     const updated:Chat = {...target, ...payload, updated_at: new Date().toISOString()};
+    console.log(updated);
 
     this.chatMap.set(id, updated);
 
