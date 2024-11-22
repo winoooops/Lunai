@@ -16,6 +16,10 @@ export const messageResolvers = {
     createTextReplyFromConversation: async (_: any, { messages } : { messages: Message[]} ): Promise<Message> => {
       const aiService = getAIService();
       return await aiService.createTextReplyFromConversation(messages);
-    }  
+    },  
+    createTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }): Promise<Message> => {
+      const aiService = getAIService();
+      return await aiService.createTextReplyFromPromt(prompt);
+    } 
   }
 }

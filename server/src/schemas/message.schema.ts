@@ -29,5 +29,6 @@ export const MessageSchema = `#graphql
 
   type Mutation {
     createTextReplyFromConversation(messages: [MessageInput]!): Message
+    createTextReplyFromPrompt(prompt: String!): Message
   }
 `

@@ -3,16 +3,7 @@ export interface XAICompletionMessage {
   content: string;
 }
 
-export interface XAICompletionParams {
-  /** 
-   * A list of messages that make up the the chat conversation. 
-   * Different models support different message types, such as image and text.
-  */
-  messages: XAICompletionMessage[]; 
-  /**
-   * Model name for the model to use.
-   */
-  model: string;
+interface XAICompletionBaseParams {
   /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, 
    * decreasing the model's likelihood to repeat the same line verbatim.
@@ -46,7 +37,6 @@ export interface XAICompletionParams {
    * increasing the model's likelihood to talk about new topics.
    */
   presence_penalty?: number;
-  response_format?: unknown;
   /**
    * If specified, our system will make a best effort to sample deterministically, 
    * such that repeated requests with the same `seed` and parameters should return the same result. 
@@ -68,13 +58,6 @@ export interface XAICompletionParams {
    * while lower values like 0.2 will make it more focused and deterministic.
    */
   temperature?: number;
-  tool_choice?: unknown;
-  tools?: Array<unknown>;
-  /**
-   * An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. 
-   * logprobs must be set to true if this parameter is used.
-   */
-  top_logprobs?: number;
   /**
    * An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
    * It is generally recommended to alter this or `temperature` but not both.
@@ -84,6 +67,55 @@ export interface XAICompletionParams {
    * A unique identifier representing your end-user, which can help xAI to monitor and detect abuse.
    */
   user?: string;
+}
+
+
+/**
+ * used for request for response for a given chat conversation
+ */
+export interface XAIChatCompletionParams implements XAICompletionBaseParams{
+  /** 
+   * A list of messages that make up the the chat conversation. 
+   * Different models support different message types, such as image and text.
+  */
+  messages: XAICompletionMessage[];
+  /**
+   * Model name for the model to use.
+   */
+  model: string;
+  
+  response_format?: unknown;
+
+  tool_choice?: unknown;
+
+  tools?: Array<unknown>;
+  /**
+   * An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. 
+   * logprobs must be set to true if this parameter is used.
+   */
+  top_logprobs?: number;
+}
+
+/**
+ * used for request for response for a given prompt
+ */
+export interface XAICompletionParams implements XAICompletionBaseParams{
+  /**
+   * Specifies the model to be used for the request.
+   */
+  model: string;
+  /**
+   * prompt 
+   */
+  prompt:unknown;
+  /**
+   * Generates multiple completions internally and returns the top-scoring one. Not functional yet.
+   */
+  best_of?: number; 
+  /**
+   * Option to include the original prompt in the response along with the generated completion.
+   */
+  echo?: boolean;
 }
 
 export interface XAICompletionChoice {
@@ -99,11 +131,11 @@ export interface XAIUsage {
 }
 
 export interface XAICompletionResponse {
-  choices: XAICompletionChoice[]; 
+  choices: XAICompletionChoice[];
   created: number;
   id: string;
   model: string;
   object: string;
   system_fingerprint: string;
-  usage: XAIUsage; 
+  usage: XAIUsage;
 }

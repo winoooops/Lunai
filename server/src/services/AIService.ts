@@ -17,6 +17,7 @@ if(!API_KEY) {
 
 export interface BaseAIService {
   createTextReplyFromConversation(messages: Message[]): Promise<Message>;
+  createTextReplyFromPromt(prompt: string): Promise<Message>;
 }
 
 export const getAIService = (): BaseAIService => {

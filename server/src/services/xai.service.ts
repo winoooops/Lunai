@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { XAICompletionParams, XAICompletionResponse } from "@/types/xai";
+import { XAIChatCompletionParams, XAICompletionResponse } from "@/types/xai";
 import { Message } from "@/types/message";
 import { BaseAIService } from "./AIService";
 import { MessageService } from "./message.service";
@@ -27,7 +27,7 @@ class XAIService implements BaseAIService {
 
   async createTextReplyFromConversation(messages: Message[]): Promise<Message> {
     try {
-      const response = await this.client.post<XAICompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
+      const response = await this.client.post<XAIChatCompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
         messages: [
           {
             role: "system",
@@ -49,7 +49,7 @@ class XAIService implements BaseAIService {
           text: message.message.content
         })),
         role: response.data.choices[0].message.role,
-        model: this.model,     
+        model: response.data.model,     
         timestamp: new Date().toISOString(),
         id: uuidv4(), 
       }
@@ -60,6 +60,30 @@ class XAIService implements BaseAIService {
     } catch (error) {
       console.error("Error calling XAIService.createTextReplyFromConversation: ", error);
       throw new Error(`Error calling XAIService.createTextReplyFromConversation: ${error}`);
+    }
+  }
+
+  async createTextReplyFromPromt(prompt: string): Promise<Message> {
+    try {
+      const promptMessage: Message = {
+        id: uuidv4(),
+        timestamp: new Date().toISOString(),
+        role: "user",
+        model: this.model,
+        content: [
+          {
+            text: prompt,
+            type: "text"
+          }
+        ]
+      }; 
+
+      this.messageService.addMessage(promptMessage);
+
+      return this.createTextReplyFromConversation([promptMessage]);
+    } catch (error) {
+      console.error(error);
+      throw new Error(`Error calling XAIService.createTextReplyFromPrompt: ${error}`);
     }
   }
 }

@@ -5,6 +5,7 @@ import { Message, TextContentBlock } from "@/types/message";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
+import { timeStamp } from "console";
 
 
 class AnthropicService implements BaseAIService {
@@ -40,8 +41,31 @@ class AnthropicService implements BaseAIService {
   
       return message;
     } catch (error) {
+      console.error("Error when calling AnthropicService.createTextReplyFromConversation", error);
+      throw new Error("Error when calling AnthropicService.createTextReplyFromConversation");
+    }
+  }
+
+  async createTextReplyFromPromt(prompt: string): Promise<Message> {
+    try {
+      const promptMessage: Message = {
+        model: "grok-beta",
+        role: "user",
+        timestamp: new Date().toISOString(),
+        id: uuidv4(),
+        content: [{
+          type: "text",
+          text: prompt
+        }]
+      };
+
+      this.messageService.addMessage(promptMessage);
+
+      return this.createTextReplyFromConversation([promptMessage])
+    } 
+    catch (error) {
       console.error("Error when calling Anthropic message prompt: ", error);
-      throw new Error("Error when calling Anthropic message prompt");
+      throw new Error(`Error when calling AnthropicService.createTextReplyFromPrompt: ${error}`);
     }
   }
 }
