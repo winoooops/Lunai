@@ -1,4 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { v4 as uuidv4 } from "uuid";
+
 import { XAICompletionParams, XAICompletionResponse } from "@/types/xai";
 import { Message } from "@/types/message";
 import { BaseAIService } from "./AIService";
@@ -46,7 +48,10 @@ class XAIService implements BaseAIService {
           type: "text",
           text: message.message.content
         })),
-        role: response.data.choices[0].message.role       
+        role: response.data.choices[0].message.role,
+        model: this.model,     
+        timestamp: new Date().toISOString(),
+        id: uuidv4(), 
       }
 
       this.messageService.addMessage(message);

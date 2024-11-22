@@ -7,6 +7,9 @@ export const MessageSchema = `#graphql
   type Message {
     content: [TextContentBlock] 
     role: String!
+    timestamp: String!
+    id: String!
+    model: String
   }
 
   input TextContentBlockInput {

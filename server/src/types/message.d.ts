@@ -6,4 +6,7 @@ export interface TextContentBlock {
 export interface Message {
   content: TextContentBlock[];
   role: string;
+  timestamp: string;
+  id: string;
+  model?: string;
 }

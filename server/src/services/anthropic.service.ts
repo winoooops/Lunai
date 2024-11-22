@@ -1,5 +1,7 @@
-import { Message, TextContentBlock } from "@/types/message";
 import Anthropic from "@anthropic-ai/sdk";
+import { v4 as uuidv4 } from "uuid";
+
+import { Message, TextContentBlock } from "@/types/message";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
@@ -28,7 +30,10 @@ class AnthropicService implements BaseAIService {
   
       const message: Message = {
         content: response.content as TextContentBlock[],
-        role: response.role
+        role: response.role,
+        timestamp: new Date().toISOString(),
+        id:uuidv4(),
+        model: "grok-beta" 
       }
 
       this.messageService.addMessage(message);
