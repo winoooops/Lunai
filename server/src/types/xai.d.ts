@@ -73,7 +73,7 @@ interface XAICompletionBaseParams {
 /**
  * used for request for response for a given chat conversation
  */
-export interface XAIChatCompletionParams implements XAICompletionBaseParams{
+export interface XAIChatCompletionParams extends XAICompletionBaseParams{
   /** 
    * A list of messages that make up the the chat conversation. 
    * Different models support different message types, such as image and text.

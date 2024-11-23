@@ -8,5 +8,6 @@ export interface Message {
   role: string;
   timestamp: string;
   id: string;
-  model?: string;
+  model: string; 
+  chatId: string;
 }

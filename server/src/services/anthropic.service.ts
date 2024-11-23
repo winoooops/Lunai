@@ -6,21 +6,24 @@ import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
 import { timeStamp } from "console";
+import { ChatService } from "./chat.service";
 
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
+  private chatService: ChatService;
 
-  constructor(apiKey: string, messageService: MessageService, baseURL?: string) {
+  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
       apiKey,
       baseURL
     });
     this.messageService = messageService;
+    this.chatService = chatService;
   }
 
-  async createTextReplyFromConversation(messages: Message[]) {
+  async createTextReplyFromConversation(messages: Message[], chatId: string) {
     try {
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
@@ -34,10 +37,15 @@ class AnthropicService implements BaseAIService {
         role: response.role,
         timestamp: new Date().toISOString(),
         id:uuidv4(),
-        model: "grok-beta" 
+        model: "grok-beta",
+        chatId 
       }
 
+      // add the generated message to message service for storage
       this.messageService.addMessage(message);
+
+      // update the message to the chat message
+      this.chatService.updateChat(chatId, { messages: [...messages, message]});
   
       return message;
     } catch (error) {
@@ -46,8 +54,18 @@ class AnthropicService implements BaseAIService {
     }
   }
 
-  async createTextReplyFromPromt(prompt: string): Promise<Message> {
+  /**
+   * Creates a text reply from a prompt message. Since the prompt message does not have a chatId (No Chat was estalished),
+   * a new chat instance is created first. The prompt message is then added to the message service,
+   * and a reply is generated based on the new chat.
+   * 
+   * @param {string} prompt The input text prompt from the user.
+   * @returns {Promise<PromptMessage>} A Promise that resolves to the generated PromptMessage object.
+   */
+  async createTextReplyFromPrompt(prompt: string): Promise<Message> {
     try {
+      const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
+
       const promptMessage: Message = {
         model: "grok-beta",
         role: "user",
@@ -56,12 +74,15 @@ class AnthropicService implements BaseAIService {
         content: [{
           type: "text",
           text: prompt
-        }]
+        }],
+        chatId
       };
 
+      // add the prompt message to messageService
       this.messageService.addMessage(promptMessage);
 
-      return this.createTextReplyFromConversation([promptMessage])
+      // Generate a text reply based on the newly created chat
+      return this.createTextReplyFromConversation([promptMessage], chatId);
     } 
     catch (error) {
       console.error("Error when calling Anthropic message prompt: ", error);

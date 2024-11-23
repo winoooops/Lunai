@@ -1,9 +1,10 @@
 import { config } from 'dotenv';
 
-import { Message } from "@/types/message";
 import AnthropicService from './anthropic.service';
 import XAIService from './xai.service';
 import { MessageService } from './message.service';
+import { Message } from '@/types/message';
+import { ChatService } from './chat.service';
 
 config();
 
@@ -16,14 +17,14 @@ if(!API_KEY) {
 }
 
 export interface BaseAIService {
-  createTextReplyFromConversation(messages: Message[]): Promise<Message>;
-  createTextReplyFromPromt(prompt: string): Promise<Message>;
+  createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message>;
+  createTextReplyFromPrompt(prompt: string): Promise<Message>;
 }
 
 export const getAIService = (): BaseAIService => {
   if(ANTHROPIC_BASE_URL) {
-    return new AnthropicService(API_KEY, MessageService.getInstance(), ANTHROPIC_BASE_URL);
+    return new AnthropicService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), ANTHROPIC_BASE_URL);
   } 
 
-  return new XAIService(API_KEY, MessageService.getInstance(), BASE_URL);
+  return new XAIService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), BASE_URL);
 }

@@ -13,13 +13,13 @@ export const messageResolvers = {
     }
   },
   Mutation:{
-    createTextReplyFromConversation: async (_: any, { messages } : { messages: Message[]} ): Promise<Message> => {
+    createTextReplyFromConversation: async (_: any, { messages, chatId } : { messages: Message[], chatId: string } ): Promise<Message> => {
       const aiService = getAIService();
-      return await aiService.createTextReplyFromConversation(messages);
+      return await aiService.createTextReplyFromConversation(messages, chatId);
     },  
     createTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }): Promise<Message> => {
       const aiService = getAIService();
-      return await aiService.createTextReplyFromPromt(prompt);
+      return await aiService.createTextReplyFromPrompt(prompt);
     } 
   }
 }

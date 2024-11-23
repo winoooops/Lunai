@@ -9,7 +9,8 @@ export const MessageSchema = `#graphql
     role: String!
     timestamp: String!
     id: String!
-    model: String
+    model: String!
+    chatId: String!
   }
 
   input TextContentBlockInput {
@@ -28,7 +29,7 @@ export const MessageSchema = `#graphql
   }
 
   type Mutation {
-    createTextReplyFromConversation(messages: [MessageInput]!): Message
+    createTextReplyFromConversation(messages: [MessageInput]!, chatId: String!): Message
     createTextReplyFromPrompt(prompt: String!): Message
   }
 `
