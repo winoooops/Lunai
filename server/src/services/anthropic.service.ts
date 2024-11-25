@@ -54,14 +54,7 @@ class AnthropicService implements BaseAIService {
     }
   }
 
-  /**
-   * Creates a text reply from a prompt message. Since the prompt message does not have a chatId (No Chat was estalished),
-   * a new chat instance is created first. The prompt message is then added to the message service,
-   * and a reply is generated based on the new chat.
-   * 
-   * @param {string} prompt The input text prompt from the user.
-   * @returns {Promise<PromptMessage>} A Promise that resolves to the generated PromptMessage object.
-   */
+  
   async createTextReplyFromPrompt(prompt: string): Promise<Message> {
     try {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});

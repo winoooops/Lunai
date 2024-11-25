@@ -42,32 +42,45 @@ uration-related queries and mutations
 
 3. **Run the application:**
    ```bash
-   npm run dev
+   npm start
    ```
 
 4. **Access the GraphQL Playground:**
    Open your browser and navigate to `http://localhost:4000/graphql` to interact with your GraphQL API.
 
-## API Endpoints
-
 ### Message APIs
 
+The Message APIs allow you to manage and interact with messages in the chat application.
+
+- **Get Messages**: Retrieves all messages stored in the system.
+  - **Query:** `messages: [Message]`
+  
+- **Get Messages from Chat**: Retrieves all messages associated with a specific chat identified by `chatId`
+  - **Query:** `messagesFromChat(chatId: String!): [Message]`
+  
+- **Create Text Reply from Conversation**: Generates a text reply based on the provided messages and associates it with the specified chat.
+  - **Mutation:** `createTextReplyFromConversation(messages: [MessageInput], chatId: String!): Message`
+  
+- **Create Text Reply from Prompt**: Creates a new chat instance from the provided prompt and generates a text reply.
+  - **Mutation:** `createTextReplyFromPrompt(prompt: String!): Message`
 
 ### Chat APIs
 
-- **Create Chat**
+The Chat APIs allow you to manage chat sessions within the application.
+
+- **Create Chat**: Creates a new chat session with the specified input parameters.
   - **Mutation:** `createChat(input: ChatInput): Chat`
   
-- **Read Chats**
+- **Read Chats**: Retrieves all chat sessions stored in the system.
   - **Query:** `getChats: [Chat]`
   
-- **Update Chat**
+- **Update Chat**: Updates an existing chat session identified by `id` with the provided input.
   - **Mutation:** `updateChat(id: ID!, input: ChatInput): Chat`
   
-- **Delete Chat**
+- **Delete Chat**: Deletes a chat session identified by `id`.
   - **Mutation:** `deleteChat(id: ID!): Boolean`
 
-### Configuration APIs
+### Configuration APIs (Not yet implemented)
 
 - **Get Configuration**
   - **Query:** `getConfig: Config`
@@ -77,4 +90,5 @@ uration-related queries and mutations
 
 ## GraphQL Schema
 
-The GraphQL schema is defined in the `schemas` directory. It includes types for `Chat`, `Message` and `Config`, as well as the necessary queries and mutations.
+The GraphQL schema is defined in the `schemas` directory. It includes types for `Chat`, `Message`, as well as the necessary queries and mutations.
+

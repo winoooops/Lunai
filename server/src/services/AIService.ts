@@ -17,7 +17,25 @@ if(!API_KEY) {
 }
 
 export interface BaseAIService {
+
+    /**
+   * Generates a text reply based on an array of existing conversation messages. This method sends
+   * a request to the API and processes the response to construct a new ChatMessage object,
+   * which is then added to the message service.
+   * 
+   * @param {ChatMessage[]} messages An array of ChatMessage objects representing the conversation.
+   * @returns {Promise<ChatMessage>} A Promise that resolves to the generated ChatMessage object.
+   */
+
   createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message>;
+  /**
+   * Creates a text reply from a prompt message. Since the prompt message does not have a chatId (No Chat was estalished),
+   * a new chat instance is created first. The prompt message is then added to the message service,
+   * and a reply is generated based on the new chat.
+   * 
+   * @param {string} prompt The input text prompt from the user.
+   * @returns {Promise<PromptMessage>} A Promise that resolves to the generated PromptMessage object.
+   */
   createTextReplyFromPrompt(prompt: string): Promise<Message>;
 }
 
