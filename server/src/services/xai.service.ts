@@ -81,6 +81,11 @@ class XAIService implements BaseAIService {
             errorMessage = match[1]; // Extracted message
           }
         }
+
+        if(data && typeof data == "object") {
+          errorMessage = data.error;
+        }
+
         throw new GraphQLError(`Error occured - [${status} | ${statusText}]: ${errorMessage}`)
       }
       throw new GraphQLError(`error occured: ${error}`);

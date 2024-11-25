@@ -23,7 +23,7 @@ class AnthropicService implements BaseAIService {
   }
 
 
-  async createTextReplyFromConversation(messages: Message[], chatId: string) {
+  async createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message> {
     try {
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
@@ -48,13 +48,16 @@ class AnthropicService implements BaseAIService {
       this.chatService.updateChat(chatId, { messages: [...messages, message]});
   
       return message;
-    } catch (error) {
-      if(error instanceof Anthropic.APIError) {
-        console.error(error.status);
-        console.error(error.name);
-        console.error(error)
+    } catch (err) {
+      if(err instanceof Anthropic.APIError) {
+        const status = err.status;
+        const error = err.error;
+        let msg = "An unknown error occurred.";
+        if(error !== undefined) {
+          msg = (error as { code: string, error: string }).error;
+        }
+        throw new Error(`Error occurred - [${status} | error.error.code]: ${msg}`)
       }
-      console.error("Error when calling AnthropicService.createTextReplyFromConversation", error);
       throw new Error("Error when calling AnthropicService.createTextReplyFromConversation");
     }
   }
