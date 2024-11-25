@@ -5,7 +5,6 @@ import { Message, TextContentBlock } from "@/types/message";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
-import { timeStamp } from "console";
 import { ChatService } from "./chat.service";
 
 
@@ -22,6 +21,7 @@ class AnthropicService implements BaseAIService {
     this.messageService = messageService;
     this.chatService = chatService;
   }
+
 
   async createTextReplyFromConversation(messages: Message[], chatId: string) {
     try {
@@ -49,6 +49,11 @@ class AnthropicService implements BaseAIService {
   
       return message;
     } catch (error) {
+      if(error instanceof Anthropic.APIError) {
+        console.error(error.status);
+        console.error(error.name);
+        console.error(error)
+      }
       console.error("Error when calling AnthropicService.createTextReplyFromConversation", error);
       throw new Error("Error when calling AnthropicService.createTextReplyFromConversation");
     }
@@ -70,6 +75,7 @@ class AnthropicService implements BaseAIService {
         }],
         chatId
       };
+
 
       // add the prompt message to messageService
       this.messageService.addMessage(promptMessage);

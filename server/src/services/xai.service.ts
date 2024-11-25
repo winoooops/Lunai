@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse, isAxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 import { XAIChatCompletionParams, XAICompletionResponse } from "@/types/xai";
@@ -6,6 +6,7 @@ import { BaseAIService } from "./AIService";
 import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
 import { Message } from "@/types/message";
+import { GraphQLError } from "graphql";
 
 
 class XAIService implements BaseAIService {
@@ -28,7 +29,7 @@ class XAIService implements BaseAIService {
     this.chatService = chatService;
   }
 
-  async createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message> {
+  async createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message>{
     try {
       const response = await this.client.post<XAIChatCompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
         messages: [
@@ -67,39 +68,48 @@ class XAIService implements BaseAIService {
 
       return message;
     } catch (error) {
-      console.error("Error calling XAIService.createTextReplyFromConversation: ", error);
-      throw new Error(`Error calling XAIService.createTextReplyFromConversation: ${error}`);
+      if(isAxiosError(error)) {
+        const status = error.response?.status;
+        const statusText = error.response?.statusText;
+        const data = error.response?.data;
+
+        let errorMessage = "An unexpected error occurred";
+        // Extract the specific message from the HTML response
+        if (data && typeof data === 'string') {
+          const match = data.match(/<p>(.*?)<\/p>/);
+          if (match && match[1]) {
+            errorMessage = match[1]; // Extracted message
+          }
+        }
+        throw new GraphQLError(`Error occured - [${status} | ${statusText}]: ${errorMessage}`)
+      }
+      throw new GraphQLError(`error occured: ${error}`);
     }
   }
 
   async createTextReplyFromPrompt(prompt: string): Promise<Message> {
-    try {
-      // Create a new chat instance since no chatId is provided
-      const {id: chatId} = this.chatService.createChat({ title: prompt, messages: [] });
+    // Create a new chat instance since no chatId is provided
+    const {id: chatId} = this.chatService.createChat({ title: prompt, messages: [] });
 
-      const message: Message = {
-        id: uuidv4(),
-        timestamp: new Date().toISOString(),
-        role: "user",
-        model: this.model,
-        content: [
-          {
-            text: prompt,
-            type: "text"
-          }
-        ],
-        chatId
-      }; 
+    const message: Message = {
+      id: uuidv4(),
+      timestamp: new Date().toISOString(),
+      role: "user",
+      model: this.model,
+      content: [
+        {
+          text: prompt,
+          type: "text"
+        }
+      ],
+      chatId
+    }; 
 
-      // add the prompt message to messageService 
-      this.messageService.addMessage(message);
+    // add the prompt message to messageService 
+    this.messageService.addMessage(message);
 
-      // Generate a text reply based on the newly created chat
-      return this.createTextReplyFromConversation([message], chatId);
-    } catch (error) {
-      console.error(error);
-      throw new Error(`Error calling XAIService.createTextReplyFromPrompt: ${error}`);
-    }
+    // Generate a text reply based on the newly created chat
+    return this.createTextReplyFromConversation([message], chatId);
   }
 }
 

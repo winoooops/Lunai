@@ -1,6 +1,9 @@
 import { getAIService } from "@/services/AIService";
 import { Message } from "../types/message";
 import { MessageService } from "@/services/message.service";
+import { isAxiosError } from "axios";
+import { unwrapResolverError } from "@apollo/server/errors";
+import { GraphQLError } from "graphql";
 
 export const messageResolvers = {
   Query: {
