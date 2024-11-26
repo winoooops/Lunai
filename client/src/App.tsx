@@ -11,9 +11,10 @@ import { ChatContextProvider } from './contexts/ChatContext'
 import { SidebarProvider } from './contexts/SidebarContext'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 
+
 const client = new ApolloClient(
   {
-    uri: "https://45.32.66.110:4000",
+    uri: import.meta.env.VITE_BASE_URL || "localhost:4000",
     cache: new InMemoryCache()
   }
 )

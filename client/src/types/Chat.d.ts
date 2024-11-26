@@ -1,7 +1,8 @@
 export interface ChatItem {
   title: string;
   id: number;
-  timestamp: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ChatContextProps {

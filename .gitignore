@@ -6,6 +6,7 @@
 
 # Ignore .env file
 /server/.env
+/client/.env
 
 # Ignore built folder
 /server/dist

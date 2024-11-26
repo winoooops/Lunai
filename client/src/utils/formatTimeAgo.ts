@@ -1,6 +1,7 @@
-export const formatTimeAgo = (timestamp: Date): string => {
+export const formatTimeAgo = (timestamp: string): string => {
+    const date = new Date(timestamp);
     const now = new Date();
-    const seconds = Math.floor((now.getTime() - timestamp.getTime()) / 1000);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     let interval = Math.floor(seconds / 31536000); // Years
     if (interval >= 1) return `${interval} years ago`;
     interval = Math.floor(seconds / 2592000); // Months

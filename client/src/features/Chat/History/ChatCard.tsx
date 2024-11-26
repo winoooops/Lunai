@@ -26,7 +26,7 @@ const ChatCard: React.FC<CardProps> = ({chat}) => {
         </div>
         <div  className="card-body flex-col gap-1 w-[80%]">
           <p className="truncate font-semibold mt-2 mb-2 text-lg">{chat.title}</p>
-          <span className="bg-slate-800 px-2 py-1 text-xs font-semibold rounded-lg group-hover:bg-yellow-500 group-hover:text-slate-900 transition-transform duration-300">{formatTimeAgo(chat.timestamp)}</span>
+          <span className="bg-slate-800 px-2 py-1 text-xs font-semibold rounded-lg group-hover:bg-yellow-500 group-hover:text-slate-900 transition-transform duration-300">{formatTimeAgo(chat.updated_at)}</span>
         </div>
       </Link>
     </div>
