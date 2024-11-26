@@ -28,8 +28,8 @@ const ChatDetailsPage: React.FC = () => {
             messages.map((message, index) => (
               <MessageBubble
                 key={index}
-                isUser={message.isUser}
-                content={message.content}
+                isUser={message.role === "user"}
+                content={message.content[0]}
               />
             ))
           )}

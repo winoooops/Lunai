@@ -1,6 +1,8 @@
+import { TextContentBlock } from "@LunaiTypes/message";
+
 interface MessageBubbleProps {
     isUser: boolean;
-    content: string;
+    content: TextContentBlock;
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content }) => {
@@ -9,7 +11,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content })
             <div className={`inline-block p-3 rounded-lg ${
                 isUser ? 'bg-slate-900' : 'bg-slate-600 w-full'
             }`}>
-                <p className="text-sm text-slate-50">{content}</p>
+                <p className="text-sm text-slate-50">{content.text}</p>
             </div>
         </div>
     );
