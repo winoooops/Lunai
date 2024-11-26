@@ -13,12 +13,19 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": "src",
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* types path */
+    "paths": {
+      "@/*": ["./*"],
+      "@LunaiTypes/*": ["../../@types/shared/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src/**/*", "../@types/**/*"]
 }

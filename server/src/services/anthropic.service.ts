@@ -1,11 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { v4 as uuidv4 } from "uuid";
 
-import { Message, TextContentBlock } from "@/types/message";
 import { BaseAIService } from "./AIService";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
+import { Message, TextContentBlock } from "@LunaiTypes/message";
 
 
 class AnthropicService implements BaseAIService {

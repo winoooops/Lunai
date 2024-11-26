@@ -15,9 +15,10 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@LunaiTypes/*": ["../../@types/shared/*"],
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../@types/**/*"],
   "exclude": ["node_modules"]
 }

@@ -12,3 +12,4 @@ export interface ChatParams {
   title: string;
   messages: Message[];
 }
+

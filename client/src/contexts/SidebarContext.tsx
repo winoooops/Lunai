@@ -1,5 +1,16 @@
 import React, { createContext, useContext, useState } from "react";
-import { SidebarContextProps } from "../types/Context";
+
+type Position = "left" | "right";
+
+interface SidebarContextProps {
+  sidebars: SidebarInstance[];
+  leftSidebar: SidebarInstance | undefined;
+  rightSidebar: SidebarInstance | undefined;
+  openSidebar: (id: string, position: Position, content: React.ReactNode) => void;
+  closeSidebar: (id: string) => void;
+  toggleCollapse: (id: string) => void;
+  onAnimationEnd: () => void;
+}
 
 export interface SidebarInstance {
   id: string;
@@ -19,7 +30,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const startAnimation = () => setIsAnimating(true);
   const endAnimation = () => setIsAnimating(false);
 
-  const openSidebar = (id: string, position: "left" | "right", content: React.ReactNode) => {
+  const openSidebar = (id: string, position: Position, content: React.ReactNode) => {
     if(isAnimating) return;
     startAnimation();
 

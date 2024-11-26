@@ -1,5 +1,5 @@
-import { Chat, ChatParams } from "@/types/chat";
 import { v4 as uuidv4 } from "uuid"
+import { Chat, ChatParams } from "@LunaiTypes/chat";
 
 export class ChatService {
   private static instance: ChatService;
@@ -48,7 +48,7 @@ export class ChatService {
     }
 
     const updated:Chat = {...target, ...payload, updated_at: new Date().toISOString()};
-    console.log(updated);
+    console.log(updated)
 
     this.chatMap.set(id, updated);
 

@@ -1,17 +1,22 @@
+import { Message } from "@LunaiTypes/message";
 import React, { createContext, useContext, useState } from "react";
-import { Message, MessageContextProps } from "../types/Message";
 
+export interface MessageContextProps {
+  messages: Message[];
+  onSend: (message: string) => void;
+  onClear: () => void;
+}
 const MessageContext = createContext<MessageContextProps | undefined>(undefined);
 
 export const MessageContextProvider: React.FC<{children: React.ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   const onSend = (content: string) => {
-    setMessages((prev) => [...prev, { isUser: true, content }]) 
+    // setMessages((prev) => [...prev, { isUser: true, content }]) 
   }
 
   const onClear = () => {
-    setMessages([]);
+    // setMessages([]);
   }
 
   return (

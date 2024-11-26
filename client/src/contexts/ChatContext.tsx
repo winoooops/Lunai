@@ -1,15 +1,21 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ChatContextProps, ChatItem } from "../types/Chat";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_CHATS } from "../graphql/operations";
+import { Chat } from "@LunaiTypes/chat";
 
+interface ChatContextProps {
+  chats: Chat[];
+  deleteChatById: (id: string) => void;
+  editChat: (id: string, payload: Partial<Chat>) => void;
+  getChatInfo: () => Chat | undefined;
+}
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { loading, error, data } = useQuery(GET_CHATS);
-  const [chats, setChats] = useState<ChatItem[]>([])
+  const [chats, setChats] = useState<Chat[]>([])
 
   useEffect(() => {
     if(data && data.chats) {
@@ -20,17 +26,17 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Todo: should display a pending singal
 
 
-  const deleteChatById = (id: number) => {
-    setChats((prev) => prev.filter((chat: ChatItem) => chat.id !== id));
+  const deleteChatById = (id: string) => {
+    setChats((prev) => prev.filter((chat: Chat) => chat.id !== id));
   }
 
-  const editChat = (id: number, payload: Partial<ChatItem>) => {
-    setChats((prev) => prev.map((chat:ChatItem) => chat.id === id ? {...chat, ...payload} : chat));
+  const editChat = (id: string, payload: Partial<Chat>) => {
+    setChats((prev) => prev.map((chat:Chat) => chat.id === id ? {...chat, ...payload} : chat));
   }
 
-  const getChatInfo = (): ChatItem | undefined => {
+  const getChatInfo = (): Chat | undefined => {
     const { chatId } = useParams();
-    return chats.find((chat) => chat.id === Number(chatId));
+    return chats.find((chat) => chat.id === chatId);
   }
 
   return (

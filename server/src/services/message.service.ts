@@ -1,4 +1,4 @@
-import { Message } from "@/types/message";
+import { Message } from "@LunaiTypes/message";
 
 export class MessageService {
   private static instance: MessageService;

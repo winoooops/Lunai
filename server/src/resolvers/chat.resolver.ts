@@ -1,5 +1,5 @@
 import { ChatService } from "@/services/chat.service"
-import { Chat, ChatParams } from "@/types/chat";
+import { Chat, ChatParams } from "@LunaiTypes/chat";
 
 export const chatResolvers = {
   Query: {

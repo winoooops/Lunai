@@ -3,8 +3,8 @@ import { config } from 'dotenv';
 import AnthropicService from './anthropic.service';
 import XAIService from './xai.service';
 import { MessageService } from './message.service';
-import { Message } from '@/types/message';
 import { ChatService } from './chat.service';
+import { Message } from '@LunaiTypes/message';
 
 config();
 

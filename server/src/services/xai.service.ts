@@ -1,12 +1,12 @@
 import axios, { AxiosInstance, AxiosResponse, isAxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { XAIChatCompletionParams, XAICompletionResponse } from "@/types/xai";
 import { BaseAIService } from "./AIService";
 import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
-import { Message } from "@/types/message";
 import { GraphQLError } from "graphql";
+import { Message } from "@LunaiTypes/message";
+import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai";
 
 
 class XAIService implements BaseAIService {
