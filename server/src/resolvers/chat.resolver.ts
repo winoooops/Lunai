@@ -7,7 +7,7 @@ export const chatResolvers = {
       const chatService = ChatService.getInstance();
       return chatService.getChats();
     },
-    getChat: (chatId: string): Chat | undefined => {
+    getChat: (_: any, { chatId } : { chatId: string} ): Chat | undefined => {
       const chatService = ChatService.getInstance();
       return chatService.getChatById(chatId);
     }
