@@ -29,7 +29,7 @@ export const MessageSchema = `#graphql
   }
 
   type Mutation {
-    createTextReplyFromConversation(prompt: String!, messages: [MessageInput]!, chatId: String!): Message
+    createTextReplyFromConversation(prompt: String!, chatId: String!): Message
     createTextReplyFromPrompt(prompt: String!): Message
   }
 `
