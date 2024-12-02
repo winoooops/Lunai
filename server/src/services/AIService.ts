@@ -24,11 +24,10 @@ export interface BaseAIService {
    * which is then added to the message service.
    * 
    * @param {string} prompt The input text prompt from the user.
-   * @param {ChatMessage[]} messages An array of ChatMessage objects representing the conversation.
    * @returns {Promise<ChatMessage>} A Promise that resolves to the generated ChatMessage object.
    */
 
-  createTextReplyFromConversation(prompt: string, messages: Message[], chatId: string): Promise<Message>;
+  createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message>;
   /**
    * Creates a text reply from a prompt message. Since the prompt message does not have a chatId (No Chat was estalished),
    * a new chat instance is created first. The prompt message is then added to the message service,

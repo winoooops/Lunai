@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 import { Chat, ChatParams } from "@LunaiTypes/chat";
+import { Message } from "@LunaiTypes/message";
 
 export class ChatService {
   private static instance: ChatService;
@@ -48,10 +49,19 @@ export class ChatService {
     }
 
     const updated:Chat = {...target, ...payload, updated_at: new Date().toISOString()};
-    console.log(updated)
 
     this.chatMap.set(id, updated);
 
     return updated;
+  }
+
+  appendMessage(id: string, message: Message): Chat | undefined {
+    const target = this.getChatById(id);
+
+    if(!target) return;
+
+    target.messages.push(message); 
+
+    return target;
   }
 }

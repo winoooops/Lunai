@@ -23,7 +23,7 @@ class AnthropicService implements BaseAIService {
   }
 
 
-  async createTextReplyFromConversation(prompt: string, messages: Message[], chatId: string): Promise<Message> {
+  async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {
     try {
       const promptMessage: Message = {
         model: "grok-beta",
@@ -39,6 +39,9 @@ class AnthropicService implements BaseAIService {
 
       // add the prompt message to messageService
       this.messageService.addMessage(promptMessage);
+
+      // should get the previous messages 
+      const messages = this.chatService.getChatById(chatId)?.messages || [];  
 
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
@@ -60,7 +63,9 @@ class AnthropicService implements BaseAIService {
       this.messageService.addMessage(message);
 
       // update the promptMesasge and message to the chat message
-      this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]});
+      // this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]});
+      this.chatService.appendMessage(chatId, promptMessage);
+      this.chatService.appendMessage(chatId, message);
   
       return message;
     } catch (err) {
@@ -83,7 +88,7 @@ class AnthropicService implements BaseAIService {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
 
       // Generate a text reply based on the newly created chat
-      return this.createTextReplyFromConversation(prompt, [], chatId);
+      return this.createTextReplyFromConversation(prompt, chatId);
     } 
     catch (error) {
       console.error("Error when calling Anthropic message prompt: ", error);

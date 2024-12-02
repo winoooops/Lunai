@@ -29,7 +29,7 @@ class XAIService implements BaseAIService {
     this.chatService = chatService;
   }
 
-  async createTextReplyFromConversation(prompt: string, messages: Message[], chatId: string): Promise<Message>{
+  async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message>{
     try {
       const promptMessage: Message = {
         id: uuidv4(),
@@ -47,6 +47,9 @@ class XAIService implements BaseAIService {
 
       // add the prompt message to messageService 
       this.messageService.addMessage(promptMessage);
+
+      // get the previous messages
+      const messages = this.chatService.getChatById(chatId)?.messages || []; 
 
       const response = await this.client.post<XAIChatCompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
         messages: [
@@ -84,7 +87,9 @@ class XAIService implements BaseAIService {
       this.messageService.addMessage(message);
 
       // update the messages to the ChatService
-      this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]})
+      // this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]})
+      this.chatService.appendMessage(chatId, promptMessage);
+      this.chatService.appendMessage(chatId, message);
 
       return message;
     } catch (error) {
@@ -118,7 +123,7 @@ class XAIService implements BaseAIService {
 
 
     // Generate a text reply based on the newly created chat
-    return this.createTextReplyFromConversation(prompt, [], chatId);
+    return this.createTextReplyFromConversation(prompt, chatId);
   }
 }
 

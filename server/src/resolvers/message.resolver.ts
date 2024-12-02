@@ -13,9 +13,9 @@ export const messageResolvers = {
     }
   },
   Mutation:{
-    createTextReplyFromConversation: async (_: any, { prompt, messages, chatId } : { prompt: string, messages: Message[], chatId: string } ): Promise<Message> => {
+    createTextReplyFromConversation: async (_: any, { prompt, chatId } : { prompt: string, chatId: string } ): Promise<Message> => {
       const aiService = getAIService();
-      return await aiService.createTextReplyFromConversation(prompt, messages, chatId);
+      return await aiService.createTextReplyFromConversation(prompt, chatId);
     },  
     createTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }): Promise<Message> => {
       const aiService = getAIService();
