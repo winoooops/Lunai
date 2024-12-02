@@ -14,7 +14,7 @@ export const ChatSchema = `#graphql
 
   type Query {
     chats: [Chat]
-    getChat(chatId: String!): Chat
+    getChat(id: String!): Chat
   }
 
   type Mutation {
