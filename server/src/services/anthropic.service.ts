@@ -23,13 +23,28 @@ class AnthropicService implements BaseAIService {
   }
 
 
-  async createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message> {
+  async createTextReplyFromConversation(prompt: string, messages: Message[], chatId: string): Promise<Message> {
     try {
+      const promptMessage: Message = {
+        model: "grok-beta",
+        role: "user",
+        timestamp: new Date().toISOString(),
+        id: uuidv4(),
+        content: [{
+          type: "text",
+          text: prompt
+        }],
+        chatId
+      };
+
+      // add the prompt message to messageService
+      this.messageService.addMessage(promptMessage);
+
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
         max_tokens: 128,
         system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-        messages: (messages as MessageParam[]), 
+        messages: ([...messages, promptMessage] as MessageParam[]), 
       })
   
       const message: Message = {
@@ -44,8 +59,8 @@ class AnthropicService implements BaseAIService {
       // add the generated message to message service for storage
       this.messageService.addMessage(message);
 
-      // update the message to the chat message
-      this.chatService.updateChat(chatId, { messages: [...messages, message]});
+      // update the promptMesasge and message to the chat message
+      this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]});
   
       return message;
     } catch (err) {
@@ -67,24 +82,8 @@ class AnthropicService implements BaseAIService {
     try {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
 
-      const promptMessage: Message = {
-        model: "grok-beta",
-        role: "user",
-        timestamp: new Date().toISOString(),
-        id: uuidv4(),
-        content: [{
-          type: "text",
-          text: prompt
-        }],
-        chatId
-      };
-
-
-      // add the prompt message to messageService
-      this.messageService.addMessage(promptMessage);
-
       // Generate a text reply based on the newly created chat
-      return this.createTextReplyFromConversation([promptMessage], chatId);
+      return this.createTextReplyFromConversation(prompt, [], chatId);
     } 
     catch (error) {
       console.error("Error when calling Anthropic message prompt: ", error);

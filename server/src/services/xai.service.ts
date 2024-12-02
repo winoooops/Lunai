@@ -29,18 +29,38 @@ class XAIService implements BaseAIService {
     this.chatService = chatService;
   }
 
-  async createTextReplyFromConversation(messages: Message[], chatId: string): Promise<Message>{
+  async createTextReplyFromConversation(prompt: string, messages: Message[], chatId: string): Promise<Message>{
     try {
+      const promptMessage: Message = {
+        id: uuidv4(),
+        timestamp: new Date().toISOString(),
+        role: "user",
+        model: this.model,
+        content: [
+          {
+            text: prompt,
+            type: "text"
+          }
+        ],
+        chatId
+      }; 
+
+      // add the prompt message to messageService 
+      this.messageService.addMessage(promptMessage);
+
       const response = await this.client.post<XAIChatCompletionParams, AxiosResponse<XAICompletionResponse>>("/chat/completions", {
         messages: [
           {
             role: "system",
             content: "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
           },
-          ...messages.map(message => ({
-            role: message.role,
-            content: message.content[0].text
-          })) 
+          [
+            ...messages.map(message => ({
+              role: message.role,
+              content: message.content[0].text
+            })),
+            promptMessage
+          ]
         ],
         model: this.model,
         stream: false,
@@ -64,7 +84,7 @@ class XAIService implements BaseAIService {
       this.messageService.addMessage(message);
 
       // update the messages to the ChatService
-      this.chatService.updateChat(chatId, { messages: [...messages, message]})
+      this.chatService.updateChat(chatId, { messages: [...messages, promptMessage, message]})
 
       return message;
     } catch (error) {
@@ -96,25 +116,9 @@ class XAIService implements BaseAIService {
     // Create a new chat instance since no chatId is provided
     const {id: chatId} = this.chatService.createChat({ title: prompt, messages: [] });
 
-    const message: Message = {
-      id: uuidv4(),
-      timestamp: new Date().toISOString(),
-      role: "user",
-      model: this.model,
-      content: [
-        {
-          text: prompt,
-          type: "text"
-        }
-      ],
-      chatId
-    }; 
-
-    // add the prompt message to messageService 
-    this.messageService.addMessage(message);
 
     // Generate a text reply based on the newly created chat
-    return this.createTextReplyFromConversation([message], chatId);
+    return this.createTextReplyFromConversation(prompt, [], chatId);
   }
 }
 
