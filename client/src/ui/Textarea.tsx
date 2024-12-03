@@ -5,11 +5,13 @@ import { useDnDContext } from "../contexts/DnDContext";
 interface TextareaProps {
     children: React.ReactNode;
     id: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onFocus: () => void;
     onBlur: () => void;
 }
 
-const Textarea: React.FC<TextareaProps> = ({ children, id, onFocus, onBlur }) => {
+const Textarea: React.FC<TextareaProps> = ({ children, id, value, onChange, onFocus, onBlur }) => {
     const { handleDragEnter, handleDropped } = useDnDContext();
 
     useEffect(() => {
@@ -22,7 +24,9 @@ const Textarea: React.FC<TextareaProps> = ({ children, id, onFocus, onBlur }) =>
                 className="rounded-lg peer pl-4 pt-6 pr-20 block min-h-[auto] w-full bg-slate-900 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[twe-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary [&:not([data-twe-input-placeholder-active])]:placeholder:opacity-0"
                 id={id}
                 rows={4}
+                value={value}
                 placeholder=" "
+                onChange={onChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 onDragEnter={handleDragEnter}

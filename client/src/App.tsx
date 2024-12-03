@@ -7,9 +7,9 @@ import { DialogProvider } from './contexts/DialogContext'
 import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
 import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
-import { ChatContextProvider } from './contexts/ChatContext'
 import { SidebarProvider } from './contexts/SidebarContext'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
+import { ChatContextProvider } from './contexts/ChatContext'
 
 
 const client = new ApolloClient(
@@ -41,7 +41,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>  
-    </ChatContextProvider>
+    </ChatContextProvider>  
     </DnDContextProvider>  
     </SidebarProvider>
     </DialogProvider>

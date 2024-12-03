@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { ChatItem } from "../types/Chat";
 import { useChatContext } from "../contexts/ChatContext";
+import { Chat } from "@LunaiTypes/chat";
 
 const useChatRename = () => {
-  const [editingChat, setEditingChat] = useState<{ id: number | null, title: string | undefined }>({ id: null, title: undefined });
+  const [editingChat, setEditingChat] = useState<{ id: string | null, title: string | undefined }>({ id: null, title: undefined });
   const inputRef = useRef<HTMLInputElement>(null);
   const { editChat } = useChatContext();
   
@@ -13,7 +13,7 @@ const useChatRename = () => {
     }
   }, [editingChat]);
 
-  const onEdit = (entry: ChatItem) => {
+  const onEdit = (entry: Chat) => {
     setEditingChat({
       id: entry.id,
       title: entry.title

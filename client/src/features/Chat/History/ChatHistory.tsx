@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import SearchBar from "../../../ui/SearchBar";
 import { formatTimeAgo } from "../../../utils/formatTimeAgo";
-import { ChatItem } from "../../../types/Chat";
 import { useChatContext } from "../../../contexts/ChatContext";
 import ChatLink from "./ChatLink";
 import { useNavigate } from "react-router-dom";
+import { Chat } from "@LunaiTypes/chat";
 
 
 const ChatHistory: React.FC<{}> = ({}) => {
@@ -29,13 +29,13 @@ const ChatHistory: React.FC<{}> = ({}) => {
 
   // group chat entries by time sections
   const groupedEntries = filtedEntries.reduce((prev, entry) => {
-    const timeAgo = formatTimeAgo(entry.timestamp);
+    const timeAgo = formatTimeAgo(entry.updated_at);
     if(!prev[timeAgo]) {
       prev[timeAgo] = []
     }
     prev[timeAgo].push(entry);
     return prev;
-  }, {} as Record<string, ChatItem[]>);
+  }, {} as Record<string, Chat[]>);
 
   
   const handleSelect = (id: number) => {
@@ -55,7 +55,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
             Object.keys(groupedEntries).map((section) => (
               <div key={section} className="mb-4">
                 <h3 className="text-sm text-slate-500">{section}</h3>
-                {groupedEntries[section].map((entry:ChatItem) => (
+                {groupedEntries[section].map((entry:Chat) => (
                   <ChatLink key={entry.id} chatItem={entry} onSelect={handleSelect}/>                  
                 ))}
               </div>  

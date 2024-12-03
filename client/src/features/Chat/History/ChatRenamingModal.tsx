@@ -2,17 +2,17 @@ import React, { useEffect } from "react";
 import Modal, { ActionButton } from "../../../ui/Modal";
 import { useDialog } from "../../../contexts/DialogContext";
 import useChatRename from "../../../hooks/useChatRename";
-import { ChatItem } from "../../../types/Chat";
+import { Chat } from "@LunaiTypes/chat";
 
 interface ChatRenamingModalProps {
-  chat: ChatItem;
+  chat: Chat;
 }
 
 const ChatRenamingModel: React.FC<ChatRenamingModalProps> = ({ chat }) => {
-  const { closeDialog, activeDialogId } = useDialog();
+  const { closeDialog } = useDialog();
   const { editingChat, inputRef, handleInputChange, handleInputFocus, handleSave, onEdit } = useChatRename();
 
-  const handleClose = () => closeDialog(activeDialogId!);
+  const handleClose = () => closeDialog();
 
   const handleEditSave = () => {
     handleSave();

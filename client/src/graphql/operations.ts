@@ -1,5 +1,8 @@
 import { gql } from "@apollo/client";
 
+/**
+ * 
+ */
 export const GET_CHATS = gql`
   query GetChats {
     chats {
@@ -45,22 +48,75 @@ export const GET_MESSAGES_BY_CHAT = gql`
 `;
 
 export const GET_CHAT = gql`
-  query GetChat($chatId: String!) {
-    getChat(chatId: $chatId) {
+  query GetChat($id: String!) {
+    getChat(id: $id) {
       id
       title
       created_at
       updated_at
       messages {
-        chatId
         content {
           text
+          type
         }
         role
-        id
-        timestamp
         model
+        timestamp
       }
     }
   }
 `;
+
+export const UPDATE_CHAT = gql`
+  mutation UpdateChat($updateChatId: String!, $input: ChatInput!) {
+    updateChat(id: $updateChatId, input: $input) {
+      id
+      title
+      updated_at
+      messages {
+        content {
+          text
+        }
+        role
+      }
+    }
+  }
+`;
+
+export const CREATE_TEXT_REPLY_FROM_PROMPT = gql`
+  mutation CreateTextReplyFromPrompt($prompt: String!) {
+    createTextReplyFromPrompt(prompt: $prompt) {
+      id
+      chatId
+      model
+      role
+      timestamp
+      content {
+        text
+        type
+      }
+    }
+  }
+`
+
+export const CREATE_TEXT_REPLY_FROM_CONVERSATION = gql`
+  mutation CreateTextReplyFromConversation($prompt: String!, $chatId: String!) {
+    createTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
+      id
+      chatId
+      content {
+        text
+        type
+      }
+      model
+      role
+      timestamp
+    }
+  }
+`;
+
+export const DELETE_CHAT = gql`
+  mutation DeleteChat($id: String!) {
+    deleteChat(id: $id)
+  }
+`

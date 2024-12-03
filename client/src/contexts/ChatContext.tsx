@@ -1,50 +1,106 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import { GET_CHATS } from "../graphql/operations";
+import { useMutation, useQuery } from "@apollo/client";
+import { DELETE_CHAT, GET_CHAT, GET_CHATS, UPDATE_CHAT } from "../graphql/operations";
 import { Chat } from "@LunaiTypes/chat";
+import { Message } from "@LunaiTypes/message";
 
 interface ChatContextProps {
   chats: Chat[];
+  activeChat: Chat | null;
+  activeMessages: Message[];
   deleteChatById: (id: string) => void;
+  focusChat: (id: string) => void;
   editChat: (id: string, payload: Partial<Chat>) => void;
-  getChatInfo: () => Chat | undefined;
+  refetchChats: () => void;
+  refetchChat: () => void;
 }
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { loading, error, data } = useQuery(GET_CHATS);
+  // TODO: Implement subscriptions to listen for real-time chat updates
+  // This will allow the application to automatically receive updates
+  // when chats are created, updated, or deleted.
   const [chats, setChats] = useState<Chat[]>([])
+  const [activeChatId, setActiveChatId] = useState<string>("");
+  const [activeChat, setActiveChat] = useState<Chat | null>(null);
+  const { data: chatsData, refetch: refetchChatsData } = useQuery(GET_CHATS);
+  const { loading, error, data: chatData, refetch: refetchChatData } = useQuery(GET_CHAT, {
+    variables: { id: activeChatId || ""},
+    skip: !activeChatId
+  });
+
+  const [updateChat] = useMutation(UPDATE_CHAT);
+  const [deleteChat] = useMutation(DELETE_CHAT);
 
   useEffect(() => {
-    if(data && data.chats) {
-      setChats(data.chats);
+    if(chatsData && chatsData.chats) {
+      setChats(chatsData.chats);
     }
-  },[data]);
+
+    return () => setChats([]);
+  },[chatsData]);
 
   // Todo: should display a pending singal
+  useEffect(() => {
+    if(activeChatId && activeChatId !== "") {
+      refetchChatData();
+    }
+  }, [activeChatId, refetchChatData])
 
+  useEffect(() => {
+    if(chatData && chatData.getChat) {
+      setActiveChat(chatData.getChat);
+    }
 
-  const deleteChatById = (id: string) => {
-    setChats((prev) => prev.filter((chat: Chat) => chat.id !== id));
+    return () => setActiveChat(null);
+  },[chatData])
+
+  const deleteChatById = async (id: string) => {
+    const { data, errors } = await deleteChat({ variables: { id }});
+    if(errors) {
+      console.error(errors);
+    }
+
+    console.log(data);
+    setActiveChat(null);
+    setActiveChatId("");
+    refetchChats();
   }
 
-  const editChat = (id: string, payload: Partial<Chat>) => {
-    setChats((prev) => prev.map((chat:Chat) => chat.id === id ? {...chat, ...payload} : chat));
+  const editChat = async (updateChatId: string, input: Partial<Chat>) => {
+    const { data, errors } = await updateChat({ variables: { 
+      updateChatId,
+      input
+    }});
+
+    if(errors) {
+      console.error(errors);
+    }
+
+    console.log(data);
   }
 
-  const getChatInfo = (): Chat | undefined => {
-    const { chatId } = useParams();
-    return chats.find((chat) => chat.id === chatId);
+  const focusChat = (id: string) => {
+    setActiveChatId(id); 
   }
+
+  const activeMessages = activeChat ? activeChat.messages : [];  
+
+  const refetchChats = () => refetchChatsData();
+
+  const refetchChat = () => refetchChatData();
 
   return (
     <ChatContext.Provider value={{
       chats,
+      activeChat,
+      activeMessages,
       deleteChatById,
+      focusChat,
       editChat,
-      getChatInfo
+      refetchChats,
+      refetchChat
     }}>
       {children}
     </ChatContext.Provider>

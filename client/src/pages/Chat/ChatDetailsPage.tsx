@@ -4,19 +4,21 @@ import MessageInput from '../../features/Chat/Messages/MessageInput';
 import { useDnDContext } from '../../contexts/DnDContext';
 import MessageFiles from '../../features/Chat/Messages/MessageFiles';
 import MessageLanding from '../../features/Chat/Messages/MessagesLanding';
-import { useMessageContext } from '../../contexts/MessageContext';
+import { useParams } from 'react-router-dom';
+import { useChatContext } from '@/contexts/ChatContext';
 
 
 
 const ChatDetailsPage: React.FC = () => {
   const { shouldShowFiles } = useDnDContext();
-  const { messages, onSend, onClear } = useMessageContext();
-  
-  useEffect(() => {
-    onSend("I need help create my personal AI assistant.")
+  const { chatId } = useParams<{chatId: string}>();
+  const { focusChat, activeMessages: messages } = useChatContext();
 
-    return () => onClear();
-  }, []);
+  useEffect(() => {
+    if(chatId && chatId !== "") {
+      focusChat(chatId);
+    }
+  }, [chatId]);
 
   return (
     <div className='h-full flex'>
@@ -38,7 +40,7 @@ const ChatDetailsPage: React.FC = () => {
           {
             shouldShowFiles && <MessageFiles />
           }
-          <MessageInput onSendMessage={onSend} />
+          <MessageInput />
         </div>
       </div>
     </div>
