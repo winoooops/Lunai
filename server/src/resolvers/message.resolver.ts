@@ -9,7 +9,7 @@ export const messageResolvers = {
       const messageService = MessageService.getInstance();
       return messageService.getMesssages(); 
     },
-    messagesFromChat: (chatId: string): Message[] => {
+    messagesFromChat: (_:any, { chatId} : { chatId: string } ): Message[] => {
       const chatService = ChatService.getInstance();
       return chatService.getChatById(chatId)?.messages || [];
     }
