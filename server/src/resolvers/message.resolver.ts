@@ -1,4 +1,5 @@
 import { getAIService } from "@/services/AIService";
+import { ChatService } from "@/services/chat.service";
 import { MessageService } from "@/services/message.service";
 import { Message } from "@LunaiTypes/message";
 
@@ -9,7 +10,8 @@ export const messageResolvers = {
       return messageService.getMesssages(); 
     },
     messagesFromChat: (chatId: string): Message[] => {
-      return [];
+      const chatService = ChatService.getInstance();
+      return chatService.getChatById(chatId)?.messages || [];
     }
   },
   Mutation:{
