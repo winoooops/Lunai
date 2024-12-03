@@ -12,7 +12,7 @@ const ChatLayout: React.FC<{}> = ({}) => {
     <>
       <ChatNav />
       <div className={`w-3/4 h-full flex ${rightSidebar?.isOpened ? "" : "justify-center"} ${isCollapsed ? "" : leftSidebar ?  "mx-auto": ""}`}>
-        <div className={`${rightSidebar?.isOpened ? "w-4/5" : "w-full"}`}>
+        <div className={`${rightSidebar?.isOpened ? "xl:w-4/5 md:w-full" : "w-full"}`}>
           <Outlet />
         </div>
       </div>

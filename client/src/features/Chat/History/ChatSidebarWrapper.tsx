@@ -9,17 +9,21 @@ const ChatSidebarWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   
   const { id, isCollapsed, isOpened } = leftSidebar;
 
+  const shouldShowCollapseButton = window.innerWidth > 768;
 
   return (
     <div className="flex flex-col flex-between rounded-lg text-slate-200 p-4 h-full">
       <div className="grow">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xs text-bold font-semibold">All Chats</h2>
-          <Button className="bg-transparent hover:bg-slate-800" onClick={() => toggleCollapse(id)}>
-            { 
-              isCollapsed ? <RiSidebarUnfoldLine /> : <RiSidebarFoldLine /> 
-            }
-          </Button>
+          {
+            shouldShowCollapseButton && 
+            <Button className="bg-transparent hover:bg-slate-800" onClick={() => toggleCollapse(id)}>
+              { 
+                isCollapsed ? <RiSidebarUnfoldLine /> : <RiSidebarFoldLine /> 
+              }
+            </Button>
+          }
         </div>
       {children}      
       </div>  

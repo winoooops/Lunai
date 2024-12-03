@@ -9,6 +9,17 @@ import ChatHistory from '../features/Chat/History/ChatHistory';
 import { RiSidebarUnfoldLine } from 'react-icons/ri';
 import ChatSidebarWrapper from '../features/Chat/History/ChatSidebarWrapper';
 
+const getHighlightThreshold = (width: number): number => {
+	if (width < 768) {
+			return 120; // For small screens
+	} else if (width < 1268) {
+			return width * 0.2; // For medium screens
+	} else {
+			return 250; // For large screens
+	}
+};
+
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -18,9 +29,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const { leftSidebar, openSidebar } = useSidebar();
 	const [isHighlight, setIsHighlight] = useState<boolean>(false);
 
+	// open sidebar on mouse near edge
 	useMouseNearEdge(!leftSidebar || !leftSidebar.isOpened, 50, () => openSidebar("left", "left", <ChatSidebarWrapper><ChatHistory /></ChatSidebarWrapper>));
 	// add gradient color for ux 
-	useMouseNearEdge(true, window.innerWidth * 0.2, () => setIsHighlight(true));
+	useMouseNearEdge(true, getHighlightThreshold(window.innerWidth), () => setIsHighlight(true));
 
 	const handleMouseLeave = () => setIsHighlight(false);
 
@@ -31,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 			className={`flex bg-slate-800 flex-col h-full w-full overflow-hidden justify-items-center ${isHighlight ? "bg-bg-gradient" : ""}`}
 		>
 			<div className="flex h-full w-full">
-				<div className="w-1/5 relative h-screen flex" onMouseLeave={handleMouseLeave}>
+				<div className="sidebar-left-container" onMouseLeave={handleMouseLeave}>
 					{ !leftSidebar?.isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
 					{ leftSidebar && <Sidebar sidebar={leftSidebar} /> }
 				</div>

@@ -37,7 +37,7 @@ const ChatNavTitle: React.FC<{}> = () => {
             <DeleteButton id="chat-delete" type="full" className="text-left bg-slate-900 hover:bg-slate-800 hover:text-yellow-400" onDelete={handleDelete}>Delete</DeleteButton>
           </ul>
         }>
-        <h2>{ activeChat?.title }</h2>
+        <h2 className="truncate">{ activeChat?.title }</h2>
         <FaAngleDown />
       </DialogButton>
     </div>
