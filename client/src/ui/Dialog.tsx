@@ -1,6 +1,25 @@
-import React, { useEffect, useRef } from 'react';
-import { DialogButtonType, DialogPosition, DialogProps } from '../types/Dialog';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { useDialog } from '../contexts/DialogContext';
+
+interface DialogProps {
+  children: React.ReactNode;
+  onClose?: () => void;
+}
+
+interface DialogButtonType {
+    id: string;
+    content: ReactNode;
+    children: ReactNode;
+    className?: string;
+    variation?: DialogVariation;
+}
+
+export type DialogVariation = "full" | "dropdown" | "dropup"; 
+export type DialogPosition = {
+    left: number;
+    top: number;
+    bottom?: number;
+}
 
 export const Dialog: React.FC<DialogProps> = ({ children }) => {
     const { closeDialog, variation, position, dialogRef } = useDialog();

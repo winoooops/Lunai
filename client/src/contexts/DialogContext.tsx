@@ -1,6 +1,16 @@
+import { DialogPosition, DialogVariation } from "@/ui/Dialog";
 import { createContext, ReactNode, useContext, useRef, useState } from "react";
-import { DialogContextType, DialogPosition, DialogVariation } from "../types/Dialog";
 
+export interface DialogContextType {
+  openDialog: (id: string, content: ReactNode, dialogVariation: DialogVariation, dialogPosition?: DialogPosition) => void;
+  closeDialog: () => void;
+  isOpen: boolean;
+  content: ReactNode | null;
+  activeDialogId: string | null;
+  variation: DialogVariation;
+  position: DialogPosition;
+  dialogRef: React.RefObject<HTMLDivElement>;
+}
 
 const DialogContext = createContext<DialogContextType | undefined>(undefined);
 
