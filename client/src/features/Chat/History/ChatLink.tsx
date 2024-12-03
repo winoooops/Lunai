@@ -10,7 +10,7 @@ interface ChatLinkProps {
 }
 
 const ChatLink: React.FC<ChatLinkProps> = ({ chatItem, onSelect }) => {
-  const { editingChat, inputRef, handleInputCancel, handleInputChange, handleInputFocus, onEdit, handleSave } = useChatRename();
+  const { editingChat, inputRef, handleInputCancel, handleInputChange, handleInputFocus, onEdit, handleSave } = useChatRename(true);
   const { enableAutoHide, disableAutoHide } = useSidebar();
 
   const handleFocus = () => {
@@ -36,7 +36,7 @@ const ChatLink: React.FC<ChatLinkProps> = ({ chatItem, onSelect }) => {
         editingChat.id === chatItem.id ? 
         <input 
           ref={inputRef} 
-          className="rounded flex-1 px-2 py-1 border bg-slate-900 focus:outline-none focus:border-yellow-400 focus:text-slate-200" value={editingChat.title} 
+          className="max-w-[82%] rounded px-2 py-1 border bg-slate-900 focus:outline-none focus:border-yellow-400 focus:text-slate-200" value={editingChat.title} 
           onChange={handleInputChange}  
           onFocus={handleFocus}
         />
