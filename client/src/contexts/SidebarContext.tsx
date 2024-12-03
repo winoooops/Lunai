@@ -4,12 +4,15 @@ type Position = "left" | "right";
 
 interface SidebarContextProps {
   sidebars: SidebarInstance[];
+  isAutoHide: boolean;
   leftSidebar: SidebarInstance | undefined;
   rightSidebar: SidebarInstance | undefined;
   openSidebar: (id: string, position: Position, content: React.ReactNode) => void;
   closeSidebar: (id: string) => void;
   toggleCollapse: (id: string) => void;
   onAnimationEnd: () => void;
+  enableAutoHide: () => void;
+  disableAutoHide: () => void;
 }
 
 export interface SidebarInstance {
@@ -26,6 +29,7 @@ const SidebarContext = createContext<SidebarContextProps | undefined>(undefined)
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebars, setSidebars] = useState<SidebarInstance[]>([]);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [isAutoHide, setIsAutoHide] = useState<boolean>(true);
 
   const startAnimation = () => setIsAnimating(true);
   const endAnimation = () => setIsAnimating(false);
@@ -64,6 +68,9 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const leftSidebar = getSidebar("left");
   const rightSidebar = getSidebar("right");
+
+  const enableAutoHide = () => setIsAutoHide(true);
+  const disableAutoHide = () => setIsAutoHide(false);
   
 
   return (
@@ -71,6 +78,9 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
       sidebars,
       leftSidebar,
       rightSidebar,
+      isAutoHide,
+      enableAutoHide,
+      disableAutoHide,
       openSidebar,
       closeSidebar,
       toggleCollapse,

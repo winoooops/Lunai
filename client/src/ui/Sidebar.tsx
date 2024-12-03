@@ -9,8 +9,8 @@ export type SidebarProps = {
 
 const Sidebar: React.FC<SidebarProps> = ({ sidebar }) => {
   const { id, content, isCollapsed, isOpened, position } = sidebar;
-  const { closeSidebar, onAnimationEnd } = useSidebar();
-  const { elementRef } = useMouseMoveOutside(isCollapsed, () => closeSidebar(id));
+  const { closeSidebar, onAnimationEnd, isAutoHide } = useSidebar();
+  const { elementRef } = useMouseMoveOutside(isCollapsed, () => closeSidebar(id), isAutoHide);
 
   const animationStyle = position === "left" ? 
     isOpened ? "sidebar-left-in" : "sidebar-left-out" : 
