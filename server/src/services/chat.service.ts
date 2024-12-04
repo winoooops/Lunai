@@ -29,7 +29,7 @@ export class ChatService {
       title: input.title,
       messages: input.messages,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toDateString()
+      updated_at: new Date().toISOString()
     }
 
     this.chatMap.set(newChat.id, newChat);
