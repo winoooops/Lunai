@@ -12,7 +12,7 @@ import { useChatContext } from '@/contexts/ChatContext';
 const ChatDetailsPage: React.FC = () => {
   const { shouldShowFiles } = useDnDContext();
   const { chatId } = useParams<{chatId: string}>();
-  const { focusChat, activeMessages: messages } = useChatContext();
+  const { focusChat, localMessages: messages } = useChatContext();
 
   useEffect(() => {
     if(chatId && chatId !== "") {
