@@ -118,6 +118,22 @@
   z-index: 999;
 }
 
+.spinner-overlay {
+  @apply bg-slate-900;
+  @apply bg-opacity-80;
+
+  position: fixed; /* Cover the entire viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background: rgba(255, 255, 255, 0.8); Semi-transparent background */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 9999; /* Ensure it is on top of other content */
+}
+
 @media (min-width: 768px) {
   .sidebar-left-container {
     width: 20%;

@@ -1,21 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useChatContext } from "../contexts/ChatContext";
 import { Chat } from "@LunaiTypes/chat";
+import { useSpinnerContext } from "@/contexts/SpinnerContext";
 
 const useChatRename = (enableKeyboard: boolean = false) => {
   const [editingChat, setEditingChat] = useState<{ id: string | null, title: string | undefined }>({ id: null, title: undefined });
   const inputRef = useRef<HTMLInputElement>(null);
-  const { editChat } = useChatContext();
+  const { editChat, updateChatLoading } = useChatContext();
+  const { enableLoading, disableLoading } = useSpinnerContext();
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if(!enableKeyboard) return;
 
       if(e.key === "Enter") {
-        console.log("enter");
         handleSave();
       } else if (e.key === "Escape") {
-        console.log("escape");
         handleInputCancel();
       }
     }
@@ -25,9 +25,16 @@ const useChatRename = (enableKeyboard: boolean = false) => {
       inputRef.current.focus();
     }
 
-
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [editingChat]);
+
+  useEffect(() => {
+    if(updateChatLoading) {
+      enableLoading();
+    } else {
+      disableLoading();
+    }
+  },[updateChatLoading])
 
   const onEdit = (entry: Chat) => {
     setEditingChat({
@@ -44,9 +51,9 @@ const useChatRename = (enableKeyboard: boolean = false) => {
     setEditingChat({ id: null, title: undefined });
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if(editingChat.id != null && editingChat.title != undefined) {
-      editChat(editingChat.id, {
+      await editChat(editingChat.id, {
         title: editingChat.title
       });
     }

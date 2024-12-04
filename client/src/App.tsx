@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import Layout from './ui/Layout'
-import { UIContextProvider } from './contexts/UIContext'
+import { SpinnerProvider } from './contexts/SpinnerContext'
 import { DnDContextProvider } from './contexts/DnDContext'
 import { DialogProvider } from './contexts/DialogContext'
 import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
@@ -24,7 +24,7 @@ const client = new ApolloClient(
 function App() {
   return (
     <ApolloProvider client={client}>
-    <UIContextProvider>
+    <SpinnerProvider>
     <DialogProvider>  
     <SidebarProvider>
     <DnDContextProvider>
@@ -45,7 +45,7 @@ function App() {
     </DnDContextProvider>  
     </SidebarProvider>
     </DialogProvider>
-    </UIContextProvider>
+    </SpinnerProvider>
     </ApolloProvider>
   )
 }

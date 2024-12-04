@@ -8,6 +8,7 @@ interface ChatContextProps {
   chats: Chat[];
   activeChat: Chat | null;
   activeMessages: Message[];
+  updateChatLoading: boolean;
   deleteChatById: (id: string) => void;
   focusChat: (id: string) => void;
   editChat: (id: string, payload: Partial<Chat>) => void;
@@ -30,8 +31,10 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     skip: !activeChatId
   });
 
-  const [updateChat] = useMutation(UPDATE_CHAT);
+  const [updateChat, { loading: updateChatLoading }] = useMutation(UPDATE_CHAT);
   const [deleteChat] = useMutation(DELETE_CHAT);
+
+  console.log(updateChatLoading);
 
   useEffect(() => {
     if(chatsData && chatsData.chats) {
@@ -69,7 +72,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }
 
   const editChat = async (updateChatId: string, input: Partial<Chat>) => {
-    const { data, errors } = await updateChat({ variables: { 
+    const { data, errors, } = await updateChat({ variables: { 
       updateChatId,
       input
     }});
@@ -96,6 +99,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       chats,
       activeChat,
       activeMessages,
+      updateChatLoading,
       deleteChatById,
       focusChat,
       editChat,
