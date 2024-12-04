@@ -29,7 +29,7 @@ const ChatHistory: React.FC<{}> = ({}) => {
 
   // group chat entries by time sections
   const groupedEntries = filtedEntries.reduce((prev, entry) => {
-    const timeAgo = formatTimeAgo(entry.updated_at);
+    const timeAgo = formatTimeAgo(entry.created_at);
     if(!prev[timeAgo]) {
       prev[timeAgo] = []
     }
@@ -37,8 +37,9 @@ const ChatHistory: React.FC<{}> = ({}) => {
     return prev;
   }, {} as Record<string, Chat[]>);
 
+  console.log(groupedEntries);
   
-  const handleSelect = (id: number) => {
+  const handleSelect = (id: string) => {
     navigate(`/chat/${id}`);
   }
 

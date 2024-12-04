@@ -12,7 +12,7 @@ const ChatHistoryButton: React.FC<ChatHistoryButtonProps> = ({ className }) => {
   const { openSidebar } = useSidebar();
 
   const onClick = () => {
-    openSidebar("chat-history", <ChatHistory />);
+    openSidebar("chat-history", "left", <ChatHistory />);
   }
 
   return (

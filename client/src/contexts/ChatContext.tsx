@@ -42,7 +42,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 
   /**
-   *  function to send textreply  
+   * function to send textreply  
    * @param prompt the prompt to send  
    * @param routingCallback the callback function to navigate to the new chat
    */
