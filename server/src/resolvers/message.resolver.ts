@@ -23,5 +23,14 @@ export const messageResolvers = {
       const aiService = getAIService();
       return await aiService.createTextReplyFromPrompt(prompt);
     } 
+  },
+  Subscription: {
+    messageStream: {
+      subscribe: (_: any, __: any, { pubsub }: { pubsub: any}) => {
+        console.log('subscribing to messageStream');
+        console.log(typeof pubsub);
+        return pubsub.asyncIterator(['MESSAGE_STREAM'])
+      }
+    }
   }
 }

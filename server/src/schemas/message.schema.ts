@@ -13,6 +13,10 @@ export const MessageSchema = `#graphql
     chatId: String!
   }
 
+  type Subscription {
+    messageStream: Message
+  }
+
   input TextContentBlockInput {
     text: String!
     type: String!

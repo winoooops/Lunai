@@ -6,12 +6,14 @@ import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
 import { Message, TextContentBlock } from "@LunaiTypes/message";
+import { PubSub } from "graphql-subscriptions";
 
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
   private chatService: ChatService;
+  private pubsub: PubSub;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
@@ -20,6 +22,7 @@ class AnthropicService implements BaseAIService {
     });
     this.messageService = messageService;
     this.chatService = chatService;
+    this.pubsub = new PubSub();
   }
 
 
@@ -93,6 +96,38 @@ class AnthropicService implements BaseAIService {
     catch (error) {
       console.error("Error when calling Anthropic message prompt: ", error);
       throw new Error(`Error when calling AnthropicService.createTextReplyFromPrompt: ${error}`);
+    }
+  }
+
+  async messageStream(prompt: string, chatId: string) {
+    try {
+      const promptMessage: Message = {
+        model: "grok-beta",
+        role: "user",
+        timestamp: new Date().toISOString(),
+        id: uuidv4(),
+        content: [{ type: "text", text: prompt }],
+        chatId
+      };
+
+      const stream = await this.anthropicInstance.messages
+        .stream({
+          model: "grok-beta",
+          max_tokens: 128,
+          system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
+          messages: ([promptMessage] as MessageParam[]),
+        })
+        .on("contentBlock", (content) => {
+          console.log('contentBlock', content);
+          this.pubsub.publish("MESSAGE_STREAM", { messageStream: { content: [{ type: "text", text: content }] } });
+        })
+        .on("message", (message) => {
+          console.log('message', message);
+          // this.pubsub.publish("MESSAGE_STREAM", { messageStream: message });
+        });
+    } catch (error) {
+      console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
+      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);
     }
   }
 }
