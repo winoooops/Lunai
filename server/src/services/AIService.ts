@@ -44,8 +44,9 @@ export interface BaseAIService {
    * 
    * @param {string} prompt The input text prompt from the user.
    * @param {PubSub} pubsub The PubSub instance to publish the streamed message to.
+   * @returns {Promise<Message>} A Promise that resolves to the finalized generated Message object.
    */
-  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): void;
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message>;
 }
 
 export const getAIService = (): BaseAIService => {

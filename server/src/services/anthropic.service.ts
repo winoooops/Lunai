@@ -143,7 +143,7 @@ class AnthropicService implements BaseAIService {
         .on("message", (message) => {
           // Save the complete message
           console.log('message', message);
-          const finalMessage: Message = {
+          finalMessage = {
             content: [{ type: "text", text: accumulatedContent }],
             role: "assistant",
             timestamp: new Date().toISOString(),

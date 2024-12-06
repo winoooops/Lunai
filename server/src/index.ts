@@ -8,12 +8,14 @@ import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import { ApolloServer } from "@apollo/server";
 import { MessageSchema } from "./schemas/message.schema";
 import { messageResolvers } from "./resolvers/message.resolver";
 import { ChatSchema } from './schemas/chat.schema';
 import { chatResolvers } from './resolvers/chat.resolver';
 
+// load environment variables
 config();
 
 const schema = makeExecutableSchema({
@@ -24,13 +26,16 @@ const schema = makeExecutableSchema({
 const app = express();
 const httpServer = createServer(app);
 
+// WebSocket server setup
 const wsServer = new WebSocketServer({
   server: httpServer,
-  path: '/subscriptions',
+  path: '/graphql',
 });
 
+// server cleanup provides a way to dispose of the server when the app is shutting down
 const serverCleanup = useServer({ schema }, wsServer);
 
+// Apollo server setup
 const server = new ApolloServer({
   schema,
   plugins: [
@@ -47,15 +52,17 @@ const server = new ApolloServer({
   ]
 });
 
+// start the server
 await server.start();
 
-
+// middleware setup
 app.use('/graphql', 
   cors<cors.CorsRequest>(), 
-  express.json(),
+  bodyParser.json(),
   expressMiddleware(server)
 );
 
+// start the http server
 const PORT = Number(process.env.PORT) || 4000;
 
 httpServer.listen(PORT, () => {
