@@ -7,7 +7,7 @@ import { ChatService } from "./chat.service";
 import { GraphQLError } from "graphql";
 import { Message } from "@LunaiTypes/message";
 import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai";
-
+import { PubSub } from "graphql-subscriptions";
 
 class XAIService implements BaseAIService {
   private client: AxiosInstance;

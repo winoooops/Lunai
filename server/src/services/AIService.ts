@@ -5,6 +5,7 @@ import XAIService from './xai.service';
 import { MessageService } from './message.service';
 import { ChatService } from './chat.service';
 import { Message } from '@LunaiTypes/message';
+import { PubSub } from "graphql-subscriptions";
 
 config();
 
