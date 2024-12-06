@@ -22,13 +22,16 @@ export const messageResolvers = {
     createTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }): Promise<Message> => {
       const aiService = getAIService();
       return await aiService.createTextReplyFromPrompt(prompt);
-    } 
+    },
+    createStreamedTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }, { pubsub }: { pubsub: any }): Promise<boolean> => {
+      const aiService = getAIService();
+      await aiService.createStreamedTextReplyFromPrompt(prompt, pubsub);
+      return true;
+    }
   },
   Subscription: {
     messageStream: {
-      subscribe: (_: any, __: any, { pubsub }: { pubsub: any}) => {
-        console.log('subscribing to messageStream');
-        console.log(typeof pubsub);
+      subscribe: (_: any, __: any, { pubsub }: { pubsub: any }) => {
         return pubsub.asyncIterator(['MESSAGE_STREAM'])
       }
     }

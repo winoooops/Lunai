@@ -28,6 +28,9 @@ class XAIService implements BaseAIService {
     this.messageService = messageService; 
     this.chatService = chatService;
   }
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): void {
+    throw new Error("Method not implemented.");
+  }
 
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message>{
     try {

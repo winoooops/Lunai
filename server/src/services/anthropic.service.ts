@@ -13,7 +13,6 @@ class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
   private chatService: ChatService;
-  private pubsub: PubSub;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
@@ -22,7 +21,6 @@ class AnthropicService implements BaseAIService {
     });
     this.messageService = messageService;
     this.chatService = chatService;
-    this.pubsub = new PubSub();
   }
 
 
@@ -99,35 +97,70 @@ class AnthropicService implements BaseAIService {
     }
   }
 
-  async messageStream(prompt: string, chatId: string) {
+  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
     try {
+      const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
+      
       const promptMessage: Message = {
         model: "grok-beta",
         role: "user",
         timestamp: new Date().toISOString(),
         id: uuidv4(),
-        content: [{ type: "text", text: prompt }],
+        content: [{
+          type: "text",
+          text: prompt
+        }],
         chatId
       };
+
+      this.messageService.addMessage(promptMessage);
+      this.chatService.appendMessage(chatId, promptMessage);
+
+      let accumulatedContent = '';
+      const messageId = uuidv4();
+      let finalMessage: Message;
 
       const stream = await this.anthropicInstance.messages
         .stream({
           model: "grok-beta",
           max_tokens: 128,
           system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-          messages: ([promptMessage] as MessageParam[]),
+          messages: [{ role: "user", content: prompt }],
         })
         .on("contentBlock", (content) => {
-          console.log('contentBlock', content);
-          this.pubsub.publish("MESSAGE_STREAM", { messageStream: { content: [{ type: "text", text: content }] } });
+          accumulatedContent += content;
+          pubsub.publish("MESSAGE_STREAM", {
+            messageStream: {
+              content: [{ type: "text", text: content }],
+              role: "assistant",
+              timestamp: new Date().toISOString(),
+              id: messageId,
+              model: "grok-beta",
+              chatId
+            }
+          });
         })
         .on("message", (message) => {
+          // Save the complete message
           console.log('message', message);
-          // this.pubsub.publish("MESSAGE_STREAM", { messageStream: message });
+          const finalMessage: Message = {
+            content: [{ type: "text", text: accumulatedContent }],
+            role: "assistant",
+            timestamp: new Date().toISOString(),
+            id: messageId,
+            model: "grok-beta",
+            chatId
+          };
+          
+          this.messageService.addMessage(finalMessage);
+          this.chatService.appendMessage(chatId, finalMessage);
         });
+
+      await stream.finalMessage();
+      return finalMessage!;
     } catch (error) {
-      console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
-      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);
+      console.error("Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ", error);
+      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ${error}`);
     }
   }
 }

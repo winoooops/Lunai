@@ -18,7 +18,7 @@ if(!API_KEY) {
 
 export interface BaseAIService {
 
-    /**
+  /**
    * Generates a text reply based on an array of existing conversation messages. This method sends
    * a request to the API and processes the response to construct a new ChatMessage object,
    * which is then added to the message service.
@@ -37,6 +37,14 @@ export interface BaseAIService {
    * @returns {Promise<PromptMessage>} A Promise that resolves to the generated PromptMessage object.
    */
   createTextReplyFromPrompt(prompt: string): Promise<Message>;
+
+  /**
+   * Creates a streamed text reply from a prompt message.
+   * 
+   * @param {string} prompt The input text prompt from the user.
+   * @param {PubSub} pubsub The PubSub instance to publish the streamed message to.
+   */
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): void;
 }
 
 export const getAIService = (): BaseAIService => {
