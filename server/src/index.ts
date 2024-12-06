@@ -14,9 +14,13 @@ import { MessageSchema } from "./schemas/message.schema";
 import { messageResolvers } from "./resolvers/message.resolver";
 import { ChatSchema } from './schemas/chat.schema';
 import { chatResolvers } from './resolvers/chat.resolver';
+import { PubSub } from "graphql-subscriptions";
 
 // load environment variables
 config();
+
+// Create a single PubSub instance to be shared
+const pubsub = new PubSub();
 
 const schema = makeExecutableSchema({
   typeDefs: [MessageSchema, ChatSchema],
@@ -32,8 +36,15 @@ const wsServer = new WebSocketServer({
   path: '/graphql',
 });
 
-// server cleanup provides a way to dispose of the server when the app is shutting down
-const serverCleanup = useServer({ schema }, wsServer);
+// Pass pubsub through WebSocket context
+const serverCleanup = useServer({
+  schema,
+  context: () => {
+    return {
+      pubsub
+    };
+  }
+}, wsServer);
 
 // Apollo server setup
 const server = new ApolloServer({
@@ -52,14 +63,17 @@ const server = new ApolloServer({
   ]
 });
 
-// start the server
 await server.start();
 
-// middleware setup
+// Pass pubsub through HTTP context
 app.use('/graphql', 
   cors<cors.CorsRequest>(), 
   bodyParser.json(),
-  expressMiddleware(server)
+  expressMiddleware(server, {
+    context: async () => ({
+      pubsub
+    })
+  })
 );
 
 // start the http server

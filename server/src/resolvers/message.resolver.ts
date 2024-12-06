@@ -2,6 +2,7 @@ import { getAIService } from "@/services/AIService";
 import { ChatService } from "@/services/chat.service";
 import { MessageService } from "@/services/message.service";
 import { Message } from "@LunaiTypes/message";
+import { PubSub } from "graphql-subscriptions";
 
 export const messageResolvers = {
   Query: {
@@ -23,7 +24,7 @@ export const messageResolvers = {
       const aiService = getAIService();
       return await aiService.createTextReplyFromPrompt(prompt);
     },
-    createStreamedTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }, { pubsub }: { pubsub: any }): Promise<Message> => {
+    createStreamedTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }, { pubsub }: { pubsub: PubSub }): Promise<Message> => {
       const aiService = getAIService();
       return await aiService.createStreamedTextReplyFromPrompt(prompt, pubsub);
     }
