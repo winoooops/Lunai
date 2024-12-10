@@ -116,13 +116,33 @@ export const DELETE_CHAT = gql`
 `
 
 export const MESSAGE_STREAM = gql`
-  subscription MessageStream {
+  subscription OnMessageStream {
     messageStream {
       id
       content {
-        text
         type
+        text
       }
+      role
+      timestamp
+      model
+      chatId
+    }
+  }
+`;
+
+export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
+  mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
+    createStreamedTextReplyFromPrompt(prompt: $prompt) {
+      id
+      content {
+        type
+        text
+      }
+      role
+      timestamp
+      model
+      chatId
     }
   }
 `;

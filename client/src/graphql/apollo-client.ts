@@ -1,31 +1,40 @@
-import { ApolloClient, createHttpLink, InMemoryCache, split } from "@apollo/client";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { getMainDefinition } from "@apollo/client/utilities";
+import { ApolloClient, InMemoryCache, split, HttpLink } from '@apollo/client';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { createClient } from 'graphql-ws';
 
-
-const httpLink = createHttpLink({
-  uri: `${import.meta.env.VITE_BASE_URL}/graphql`,
+// Create an HTTP link
+const httpLink = new HttpLink({
+  uri: `${import.meta.env.VITE_BASE_URL}/graphql`
 });
 
-const wsLink = new GraphQLWsLink({
-  uri: `${import.meta.env.VITE_BASE_URL}/subscriptions`,
-  options: {
-    reconnect: true,
-  },
-});
+// Create a WebSocket link
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: `${import.meta.env.VITE_BASE_URL}/graphql`,
+    connectionParams: {
+      // Add any auth tokens if needed
+    },
+  })
+);
 
+// Split links based on operation type
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
-    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
   },
   wsLink,
-  httpLink,
+  httpLink
 );
 
+// Create Apollo Client instance
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache()
 });
 
 export default client;
