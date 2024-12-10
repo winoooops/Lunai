@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { CREATE_TEXT_REPLY_FROM_CONVERSATION, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, UPDATE_CHAT } from "../graphql/operations";
+import { CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, UPDATE_CHAT } from "../graphql/operations";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 
@@ -13,6 +13,7 @@ interface ChatContextProps {
   getChat: (options: LazyQueryHookOptions<any, any>) => void;
   getChatLoading: boolean;
   getChatError: ApolloError | undefined;
+  pendingText: { text: string, chatId: string };
   deleteChatById: (id: string) => void;
   focusChat: (id: string) => void;
   editChat: (id: string, payload: Partial<Chat>) => void;
@@ -27,9 +28,11 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // This will allow the application to automatically receive updates
   // when chats are created, updated, or deleted.
   const [chats, setChats] = useState<Chat[]>([])
+  const [pendingText, setPendingText] = useState<{ text: string, chatId: string }>({ text: "", chatId: "" });
   const [activeChatId, setActiveChatId] = useState<string>("");
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
+
 
   const { data: chatsData, refetch: refetchChatsData } = useQuery(GET_CHATS);
   const [getChat, { loading: getChatLoading, error: getChatError }] = useLazyQuery(GET_CHAT);
@@ -37,11 +40,11 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [updateChat, { loading: updateChatLoading, error: updateChatError }] = useMutation(UPDATE_CHAT);
   const [deleteChat] = useMutation(DELETE_CHAT);
 
-  const [createTextReplyFromConversation] = useMutation(CREATE_TEXT_REPLY_FROM_CONVERSATION);
+  const [createStreamedTextReplyFromPrompt] = useMutation(CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT);
   const [createTextReplyFromPrompt] = useMutation(CREATE_TEXT_REPLY_FROM_PROMPT);
 
 
-  const { data: messageStreamData } = useSubscription(MESSAGE_STREAM);
+  const { data: messageStreamData, loading: messageStreamLoading, error: messageStreamError } = useSubscription(MESSAGE_STREAM);
 
   /**
    * function to send textreply  
@@ -60,7 +63,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         content: [{ type: "text", text: prompt }]
       }]);
       // getting text reply from conversation
-      const { data, errors } = await createTextReplyFromConversation({ variables: { prompt, chatId: activeChatId }});
+      const { data, errors } = await createStreamedTextReplyFromPrompt({ variables: { prompt, chatId: activeChatId }});
 
       if(errors) {
         throw new Error(errors[0].message);
@@ -122,6 +125,10 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     if(messageStreamData && messageStreamData.messageStream) {
       console.log(messageStreamData.messageStream);
+      setPendingText((prev) => ({
+        ...prev,
+        text: prev.text + messageStreamData.messageStream.content[0].text
+      }));
     }
   },[messageStreamData]);
   
@@ -185,6 +192,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       getChatError,
       getChatLoading,
       deleteChatById,
+      pendingText,
       focusChat,
       editChat,
       refetchChats,

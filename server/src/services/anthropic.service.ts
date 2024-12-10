@@ -23,7 +23,6 @@ class AnthropicService implements BaseAIService {
     this.chatService = chatService;
   }
 
-
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {
     try {
       const promptMessage: Message = {
@@ -82,7 +81,6 @@ class AnthropicService implements BaseAIService {
       throw new Error("Error when calling AnthropicService.createTextReplyFromConversation");
     }
   }
-
   
   async createTextReplyFromPrompt(prompt: string): Promise<Message> {
     try {
@@ -101,67 +99,76 @@ class AnthropicService implements BaseAIService {
     try {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
       
-      const promptMessage: Message = {
+      return this.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);
+      
+    } catch (error) {
+      console.error("Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ", error);
+      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ${error}`);
+    }
+  }
+
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+    try {
+    const promptMessage: Message = {
+      model: "grok-beta",
+      role: "user",
+      timestamp: new Date().toISOString(),
+      id: uuidv4(),
+      content: [{ type: "text", text: prompt }],
+      chatId
+    };
+
+    this.messageService.addMessage(promptMessage);
+    this.chatService.appendMessage(chatId, promptMessage);
+
+    // get the previous messages
+    const messages = this.chatService.getChatById(chatId)?.messages || [];
+
+    let accumulatedContent = '';
+    let finalMessage: Message;
+    const messageId = uuidv4();
+
+    const stream = await this.anthropicInstance.messages
+      .stream({
         model: "grok-beta",
-        role: "user",
-        timestamp: new Date().toISOString(),
-        id: uuidv4(),
-        content: [{
-          type: "text",
-          text: prompt
-        }],
-        chatId
-      };
-
-      this.messageService.addMessage(promptMessage);
-      this.chatService.appendMessage(chatId, promptMessage);
-
-      let accumulatedContent = '';
-      const messageId = uuidv4();
-      let finalMessage: Message;
-
-      const stream = await this.anthropicInstance.messages
-        .stream({
-          model: "grok-beta",
-          max_tokens: 128,
-          system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-          messages: [{ role: "user", content: prompt }],
-        })
-        .on("text", (content) => {
-          console.log('content: ', content);
-          accumulatedContent += content;
-          pubsub.publish("MESSAGE_STREAM", {
-            messageStream: {
-              content: [{ type: "text", text: content }],
-              role: "assistant",
-              timestamp: new Date().toISOString(),
-              id: messageId,
-              model: "grok-beta",
-              chatId
-            }
-          });
-        })
-        .on("message", (message) => {
-          // Save the complete message
-          console.log('message', message);
-          finalMessage = {
-            content: [{ type: "text", text: accumulatedContent }],
+        max_tokens: 128,
+        system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
+        messages: ([...messages, promptMessage] as MessageParam[]),
+      })
+      .on("text", (content) => {
+        console.log('content: ', content);
+        accumulatedContent += content;
+        pubsub.publish("MESSAGE_STREAM", {
+          messageStream: {
+            content: [{ type: "text", text: content }],
             role: "assistant",
             timestamp: new Date().toISOString(),
             id: messageId,
             model: "grok-beta",
             chatId
-          };
-          
-          this.messageService.addMessage(finalMessage);
-          this.chatService.appendMessage(chatId, finalMessage);
+          }
         });
+      })
+      .on("message", (message) => {
+        console.log('message', message);
+        finalMessage = {
+          content: [{ type: "text", text: accumulatedContent }],
+          role: "assistant",
+          timestamp: new Date().toISOString(),
+          id: uuidv4(),
+          model: "grok-beta",
+          chatId
+        };
+
+        this.messageService.addMessage(finalMessage);
+        this.chatService.appendMessage(chatId, finalMessage);
+      });
 
       await stream.finalMessage();
       return finalMessage!;
     } catch (error) {
-      console.error("Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ", error);
-      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ${error}`);
+      console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
+      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);
     }
   }
 }
