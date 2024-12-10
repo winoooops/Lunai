@@ -12,6 +12,10 @@ export const ChatSchema = `#graphql
     messages: [MessageInput]
   }
 
+  type Subscription {
+    chatAdded: Chat
+  }
+
   type Query {
     chats: [Chat]
     getChat(id: String!): Chat

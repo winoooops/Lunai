@@ -31,8 +31,8 @@ export const messageResolvers = {
   },
   Subscription: {
     messageStream: {
-      subscribe: (_: any, __: any, { pubsub }: { pubsub: any }) => {
-        return pubsub.asyncIterator(['MESSAGE_STREAM'])
+      subscribe: (_: any, __: any, { pubsub }: { pubsub: PubSub }) => {
+        return pubsub.asyncIterableIterator(['MESSAGE_STREAM'])
       }
     }
   }

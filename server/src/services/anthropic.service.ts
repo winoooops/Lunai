@@ -128,6 +128,8 @@ class AnthropicService implements BaseAIService {
           messages: [{ role: "user", content: prompt }],
         })
         .on("contentBlock", (content) => {
+          console.log(pubsub);
+          console.log('content: ', content);
           accumulatedContent += content;
           pubsub.publish("MESSAGE_STREAM", {
             messageStream: {
