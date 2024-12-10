@@ -114,3 +114,15 @@ export const DELETE_CHAT = gql`
     deleteChat(id: $id)
   }
 `
+
+export const MESSAGE_STREAM = gql`
+  subscription MessageStream {
+    messageStream {
+      id
+      content {
+        text
+        type
+      }
+    }
+  }
+`;

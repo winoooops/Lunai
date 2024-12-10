@@ -8,16 +8,9 @@ import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
 import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { SidebarProvider } from './contexts/SidebarContext'
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client'
 import { ChatContextProvider } from './contexts/ChatContext'
-
-
-const client = new ApolloClient(
-  {
-    uri: import.meta.env.VITE_BASE_URL || "localhost:4000",
-    cache: new InMemoryCache()
-  }
-)
+import client from './graphql/apollo-client'
 
 
 

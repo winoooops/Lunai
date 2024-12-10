@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { CREATE_TEXT_REPLY_FROM_CONVERSATION, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, UPDATE_CHAT } from "../graphql/operations";
+import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { CREATE_TEXT_REPLY_FROM_CONVERSATION, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, UPDATE_CHAT } from "../graphql/operations";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 
@@ -40,6 +40,8 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [createTextReplyFromConversation] = useMutation(CREATE_TEXT_REPLY_FROM_CONVERSATION);
   const [createTextReplyFromPrompt] = useMutation(CREATE_TEXT_REPLY_FROM_PROMPT);
 
+
+  const { data: messageStreamData } = useSubscription(MESSAGE_STREAM);
 
   /**
    * function to send textreply  
@@ -116,6 +118,13 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [activeChatId, getChat])
 
+
+  useEffect(() => {
+    if(messageStreamData && messageStreamData.messageStream) {
+      console.log(messageStreamData.messageStream);
+    }
+  },[messageStreamData]);
+  
 
   /**
    * delete chat by id
