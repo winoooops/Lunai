@@ -8,15 +8,10 @@ import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
 import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { SidebarProvider } from './contexts/SidebarContext'
-import { ApolloProvider } from '@apollo/client'
 import { ChatContextProvider } from './contexts/ChatContext'
-import client from './graphql/apollo-client'
-
-
 
 function App() {
   return (
-    <ApolloProvider client={client}>
     <SpinnerProvider>
     <DialogProvider>  
     <SidebarProvider>
@@ -39,7 +34,6 @@ function App() {
     </SidebarProvider>
     </DialogProvider>
     </SpinnerProvider>
-    </ApolloProvider>
   )
 }
 
