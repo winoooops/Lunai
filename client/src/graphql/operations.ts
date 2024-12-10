@@ -93,6 +93,22 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = gql`
   }
 `
 
+export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
+  mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
+    createStreamedTextReplyFromPrompt(prompt: $prompt) {
+      id
+      chatId
+      timestamp
+      content {
+        type
+        text
+      }
+      role
+      model
+    }
+  }
+`;
+
 export const CREATE_TEXT_REPLY_FROM_CONVERSATION = gql`
   mutation CreateTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
@@ -131,18 +147,4 @@ export const MESSAGE_STREAM = gql`
   }
 `;
 
-export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
-  mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
-    createStreamedTextReplyFromPrompt(prompt: $prompt) {
-      id
-      content {
-        type
-        text
-      }
-      role
-      timestamp
-      model
-      chatId
-    }
-  }
-`;
+
