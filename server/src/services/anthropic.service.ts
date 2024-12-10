@@ -127,8 +127,7 @@ class AnthropicService implements BaseAIService {
           system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
           messages: [{ role: "user", content: prompt }],
         })
-        .on("contentBlock", (content) => {
-          console.log(pubsub);
+        .on("text", (content) => {
           console.log('content: ', content);
           accumulatedContent += content;
           pubsub.publish("MESSAGE_STREAM", {
