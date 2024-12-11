@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, UPDATE_CHAT } from "../graphql/operations";
+import { CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION, CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, MESSAGE_STREAM_COMPLETE, UPDATE_CHAT } from "../graphql/operations";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
+import { useSpinnerContext } from "./SpinnerContext";
 
 interface ChatContextProps {
   chats: Chat[];
@@ -24,9 +25,8 @@ interface ChatContextProps {
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // TODO: Implement subscriptions to listen for real-time chat updates
-  // This will allow the application to automatically receive updates
-  // when chats are created, updated, or deleted.
+  const { enableLoading, disableLoading } = useSpinnerContext();
+  // TODO: implement cache for chats, meaning that the chats will be fetched from the cache first, and then from the server if not found in the cache
   const [chats, setChats] = useState<Chat[]>([])
   const [pendingText, setPendingText] = useState<{ text: string, chatId: string }>({ text: "", chatId: "" });
   const [activeChatId, setActiveChatId] = useState<string>("");
@@ -40,11 +40,12 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [updateChat, { loading: updateChatLoading, error: updateChatError }] = useMutation(UPDATE_CHAT);
   const [deleteChat] = useMutation(DELETE_CHAT);
 
-  const [createStreamedTextReplyFromPrompt] = useMutation(CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT);
   const [createTextReplyFromPrompt] = useMutation(CREATE_TEXT_REPLY_FROM_PROMPT);
+  const [createStreamedTextReplyFromConversation] = useMutation(CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION);
 
 
-  const { data: messageStreamData, loading: messageStreamLoading, error: messageStreamError } = useSubscription(MESSAGE_STREAM);
+  const { data: messageStreamData, error: messageStreamError } = useSubscription(MESSAGE_STREAM);
+  const { data: messageStreamCompleteData, error: messageStreamCompleteError } = useSubscription(MESSAGE_STREAM_COMPLETE);
 
   /**
    * function to send textreply  
@@ -63,13 +64,17 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         content: [{ type: "text", text: prompt }]
       }]);
       // getting text reply from conversation
-      const { data, errors } = await createStreamedTextReplyFromPrompt({ variables: { prompt, chatId: activeChatId }});
+      const { data, errors } = await createStreamedTextReplyFromConversation({ variables: { prompt, chatId: activeChatId }});
 
       if(errors) {
         throw new Error(errors[0].message);
       }
 
-      setLocalMessages((prev) => [...prev, data.createTextReplyFromConversation]);
+      if(data.createStreamedTextReplyFromConversation.chatId) {
+        setLocalMessages((prev) => [...prev, data.createStreamedTextReplyFromConversation]);
+      }
+
+
     } else {
       // getting text reply from prompt
       const { data, errors } = await createTextReplyFromPrompt({ variables: { prompt }});
@@ -104,10 +109,16 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     const fetchChat = async () => {
       if(activeChatId && activeChatId !== "") {
-        const { data } = await getChat({ variables: { id: activeChatId }});
+        // Clear the current messages while fetching
+        setLocalMessages([]);
+        
+        const { data } = await getChat({ 
+          variables: { id: activeChatId },
+          fetchPolicy: 'network-only' // Force fetch from network instead of cache
+        });
+
         if(data && data.getChat) {
           setActiveChat(data.getChat);
-          // when a new chat is fetched, reset the local messages to sync up with the remote ones
           setLocalMessages(data.getChat.messages);
         }
       }
@@ -118,20 +129,51 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return () => {
       setActiveChat(null);
       setLocalMessages([]);
+      // Also clear any pending text when switching chats
+      setPendingText({ chatId: "", text: "" });
     }
-  }, [activeChatId, getChat])
+  }, [activeChatId, getChat]);
 
 
   useEffect(() => {
+    if(getChatLoading) {
+      enableLoading();
+    } else {
+      disableLoading();
+    }
+  },[getChatLoading])
+
+  /**
+   * focus chat by id
+   * @param {string} id the chatId of the chat to focus
+   */
+  const focusChat = (id: string) => {
+    if (id !== activeChatId) {  // Only update if it's a different chat
+      setActiveChat(null);
+      setLocalMessages([]);
+      setActiveChatId(id);
+    }
+  }
+
+  // Handle message stream updates
+  useEffect(() => {
     if(messageStreamData && messageStreamData.messageStream) {
-      console.log(messageStreamData.messageStream);
       setPendingText((prev) => ({
-        ...prev,
+        chatId: prev.chatId ? prev.chatId : messageStreamData.messageStream.chatId,
         text: prev.text + messageStreamData.messageStream.content[0].text
       }));
     }
   },[messageStreamData]);
   
+
+  useEffect(() => {
+    if(messageStreamCompleteData?.messageStreamComplete) {
+      const { chatId } = messageStreamCompleteData.messageStreamComplete;
+      if(chatId === activeChatId) {
+        setPendingText({ chatId: "", text: "" });
+      }
+    }
+  },[messageStreamCompleteData]);
 
   /**
    * delete chat by id
@@ -169,14 +211,14 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     console.log(data);
   }
 
-  /**
-   * focus chat by id
-   * @param {string} id the chatId of the chat to focus
-   */
-  const focusChat = (id: string) => {
-    // reset active chat
-    setActiveChat(null);
-    setActiveChatId(id); 
+
+  console.log(messageStreamData);
+  if(messageStreamError) {
+    console.error(messageStreamError);
+  }
+
+  if(messageStreamCompleteError) {
+    console.error(messageStreamCompleteError);
   }
 
   const refetchChats = () => refetchChatsData();

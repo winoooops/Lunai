@@ -10,23 +10,23 @@ const MessageList: React.FC<{chatId: string}> = ({ chatId }) => {
   }
 
   return (
-    <>
+    <div className="px-4 py-6">
       {messages.map((message, index) => (
         <MessageBubble
           key={index}
-          isUser={message.role === "user"}
-          content={message.content[0]}
+          isUser={message?.role === "user"}
+          content={message?.content[0]}
         />
       ))}
 
-      {pendingText.chatId === chatId&& (
+      {pendingText.chatId === chatId && (
         <MessageBubble
           isUser={false}
           content={{ type: "text", text: pendingText.text }}
         />
       )}
 
-    </>
+    </div>
   );
 };
 

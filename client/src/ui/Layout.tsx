@@ -42,9 +42,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 			onDragOver={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
 			className={`flex bg-slate-800 flex-col h-full w-full overflow-hidden justify-items-center ${isHighlight ? "bg-bg-gradient" : ""}`}
 		>
-			<div className="flex h-full w-full">
+			<div className="flex h-full w-full overflow-y-auto">
 				<div className="sidebar-left-container" onMouseLeave={handleMouseLeave}>
-					{ !leftSidebar?.isOpened && <div className="absolute bottom-6 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
+					{ !leftSidebar?.isOpened && <div className="sticky top-0 bottom-0 left-5 text-slate-200"><RiSidebarUnfoldLine /></div> }
 					{ leftSidebar && <Sidebar sidebar={leftSidebar} /> }
 				</div>
 				<div className={`flex w-4/5`}>

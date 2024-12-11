@@ -35,7 +35,7 @@ const MessageInput: React.FC<{}> = () => {
   
 
   return (
-    <div className="relative w-full mx-auto mb-20">
+    <div className="relative w-full mx-auto">
       <form onSubmit={handleSubmit}>
         <Textarea id="MesasgeInput" value={prompt} onChange={onChange} onFocus={onFocus} onBlur={onBlur} onSubmit={onTriggerSubmit}>
           <label

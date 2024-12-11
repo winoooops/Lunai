@@ -103,6 +103,9 @@
 
 .sidebar-left-container {
   width: 120px;
+  position: sticky;
+  top: 0;
+  bottom:0;
 }
 
 .sidebar-left {
@@ -137,8 +140,9 @@
 @media (min-width: 768px) {
   .sidebar-left-container {
     width: 20%;
-    position: relative;
-    height: 100%;
+    position: sticky;
+    top: 0;
+    bottom:0;
     display: flex;
   }
 
@@ -162,6 +166,9 @@
 @media (min-width: 1268px) {
   .sidebar-left-container {
     width: 250px;
+    position: sticky;
+    top: 0;
+    bottom: 0;
   }
 }
 
