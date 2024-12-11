@@ -140,10 +140,7 @@ class AnthropicService implements BaseAIService {
         pubsub.publish("MESSAGE_STREAM", {
           messageStream: {
             content: [{ type: "text", text: content }],
-            role: "assistant",
-            timestamp: new Date().toISOString(),
             id: messageId,
-            model: "grok-beta",
             chatId
           }
         });
@@ -152,7 +149,7 @@ class AnthropicService implements BaseAIService {
         // Publish completion event
         pubsub.publish("MESSAGE_STREAM_COMPLETE", {
           messageStreamComplete: {
-            messageId,
+            chatId,
             finalContent: accumulatedContent
           }
         });

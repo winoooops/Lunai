@@ -13,13 +13,19 @@ export const MessageSchema = `#graphql
     chatId: String!
   }
 
-  type MessageStreamComplete {
+  type MessageStream {
+    chatId: String!
     messageId: String!
+    content: [TextContentBlock]
+  }
+
+  type MessageStreamComplete {
+    chatId: String!
     finalContent: String!
   }
 
   type Subscription {
-    messageStream: Message
+    messageStream: MessageStream
     messageStreamComplete: MessageStreamComplete
   }
 
