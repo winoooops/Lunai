@@ -27,6 +27,10 @@ export const messageResolvers = {
     createStreamedTextReplyFromPrompt: async (_: any, { prompt }: { prompt: string }, { pubsub }: { pubsub: PubSub }): Promise<Message> => {
       const aiService = getAIService();
       return await aiService.createStreamedTextReplyFromPrompt(prompt, pubsub);
+    },
+    createStreamedTextReplyFromConversation: async (_: any, { prompt, chatId }: { prompt: string, chatId: string }, { pubsub }: { pubsub: PubSub }): Promise<Message> => {
+      const aiService = getAIService();
+      return await aiService.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);
     }
   },
   Subscription: {

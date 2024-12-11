@@ -47,6 +47,16 @@ export interface BaseAIService {
    * @returns {Promise<Message>} A Promise that resolves to the finalized generated Message object.
    */
   createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message>;
+
+  /**
+   * Creates a streamed text reply from a conversation.
+   * 
+   * @param {string} prompt The input text prompt from the user.
+   * @param {string} chatId The chatId of the conversation.
+   * @param {PubSub} pubsub The PubSub instance to publish the streamed message to.
+   * @returns {Promise<Message>} A Promise that resolves to the finalized generated Message object.
+   */
+  createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message>;
 }
 
 export const getAIService = (): BaseAIService => {

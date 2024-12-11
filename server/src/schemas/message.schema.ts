@@ -36,5 +36,6 @@ export const MessageSchema = `#graphql
     createTextReplyFromConversation(prompt: String!, chatId: String!): Message
     createTextReplyFromPrompt(prompt: String!): Message
     createStreamedTextReplyFromPrompt(prompt: String!): Message
+    createStreamedTextReplyFromConversation(prompt: String!, chatId: String!): Message
   }
 `

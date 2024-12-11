@@ -128,6 +128,10 @@ class XAIService implements BaseAIService {
     // Generate a text reply based on the newly created chat
     return this.createTextReplyFromConversation(prompt, chatId);
   }
+
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 export default XAIService;
