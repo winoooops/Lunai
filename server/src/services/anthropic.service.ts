@@ -136,7 +136,6 @@ class AnthropicService implements BaseAIService {
         messages: ([...messages, promptMessage] as MessageParam[]),
       })
       .on("text", (content) => {
-        console.log('content: ', content);
         accumulatedContent += content;
         pubsub.publish("MESSAGE_STREAM", {
           messageStream: {
@@ -149,13 +148,21 @@ class AnthropicService implements BaseAIService {
           }
         });
       })
-      .on("message", (message) => {
-        console.log('message', message);
+      .on("message", (_: any) => {
+        // Publish completion event
+        pubsub.publish("MESSAGE_STREAM_COMPLETE", {
+          messageStreamComplete: {
+            messageId,
+            finalContent: accumulatedContent
+          }
+        });
+
+        // Save the final message
         finalMessage = {
           content: [{ type: "text", text: accumulatedContent }],
           role: "assistant",
           timestamp: new Date().toISOString(),
-          id: uuidv4(),
+          id: messageId,
           model: "grok-beta",
           chatId
         };
@@ -164,8 +171,8 @@ class AnthropicService implements BaseAIService {
         this.chatService.appendMessage(chatId, finalMessage);
       });
 
-      await stream.finalMessage();
-      return finalMessage!;
+    await stream.finalMessage();
+    return finalMessage!;
     } catch (error) {
       console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
       throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);

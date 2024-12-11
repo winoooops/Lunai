@@ -38,6 +38,11 @@ export const messageResolvers = {
       subscribe: (_: any, __: any, { pubsub }: { pubsub: PubSub }) => {
         return pubsub.asyncIterableIterator(['MESSAGE_STREAM'])
       }
+    },
+    messageStreamComplete: {
+      subscribe: (_: any, __: any, { pubsub }: { pubsub: PubSub }) => {
+        return pubsub.asyncIterableIterator(['MESSAGE_STREAM_COMPLETE'])
+      }
     }
   }
 }
