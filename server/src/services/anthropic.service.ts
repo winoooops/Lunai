@@ -140,7 +140,7 @@ class AnthropicService implements BaseAIService {
         pubsub.publish("MESSAGE_STREAM", {
           messageStream: {
             content: [{ type: "text", text: content }],
-            id: messageId,
+            messageId: messageId,
             chatId
           }
         });
