@@ -10,7 +10,7 @@ const MessageList: React.FC<{chatId: string}> = ({ chatId }) => {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div className="flex-1 px-4 py-6">
       {messages.map((message, index) => (
         <MessageBubble
           key={index}
