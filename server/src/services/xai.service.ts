@@ -7,7 +7,7 @@ import { ChatService } from "./chat.service";
 import { GraphQLError } from "graphql";
 import { Message } from "@LunaiTypes/message";
 import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai";
-
+import { PubSub } from "graphql-subscriptions";
 
 class XAIService implements BaseAIService {
   private client: AxiosInstance;
@@ -27,6 +27,9 @@ class XAIService implements BaseAIService {
     this.model = model || "grok-beta";
     this.messageService = messageService; 
     this.chatService = chatService;
+  }
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
+    throw new Error("Method not implemented.");
   }
 
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message>{
@@ -124,6 +127,10 @@ class XAIService implements BaseAIService {
 
     // Generate a text reply based on the newly created chat
     return this.createTextReplyFromConversation(prompt, chatId);
+  }
+
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+    throw new Error("Method not implemented.");
   }
 }
 

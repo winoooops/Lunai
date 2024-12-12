@@ -93,6 +93,38 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = gql`
   }
 `
 
+export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
+  mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
+    createStreamedTextReplyFromPrompt(prompt: $prompt) {
+      id
+      chatId
+      timestamp
+      content {
+        type
+        text
+      }
+      role
+      model
+    }
+  }
+`;
+
+export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = gql`
+  mutation CreateStreamedTextReplyFromConversation($prompt: String!, $chatId: String!) {
+    createStreamedTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
+      id
+      chatId
+      timestamp
+      content {
+        type
+        text
+      }
+      role
+      model
+    }
+  }
+`;
+
 export const CREATE_TEXT_REPLY_FROM_CONVERSATION = gql`
   mutation CreateTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
@@ -114,3 +146,25 @@ export const DELETE_CHAT = gql`
     deleteChat(id: $id)
   }
 `
+
+export const MESSAGE_STREAM = gql`
+  subscription OnMessageStream {
+    messageStream {
+      messageId
+      content {
+        type
+        text
+      }
+      chatId
+    }
+  }
+`;
+
+export const MESSAGE_STREAM_COMPLETE = gql`
+  subscription OnMessageStreamComplete {
+    messageStreamComplete {
+      chatId
+      finalContent
+    }
+  }
+`;

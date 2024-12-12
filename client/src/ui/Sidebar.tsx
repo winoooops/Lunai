@@ -17,7 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebar }) => {
     isOpened ? "sidebar-right-in" : "sidebar-right-out"; 
   
   const cssStyles = position === "left" ? 
-    `sidebar-left ${isCollapsed ? "rounded-lg" : "rounded-sm h-full"}` :
+    `sidebar-left h-full ${isCollapsed ? "rounded-lg" : "rounded-sm h-full"}` :
     "fixed top-12 right-12 h-2/3 grow bg-opacity-10 backdrop-blur-md rounded border-0.5 border-slate-200 border-solid overflow-hidden bg-gray-700"  
 
   return (

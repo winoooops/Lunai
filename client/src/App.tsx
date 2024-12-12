@@ -8,22 +8,10 @@ import ChatDetailsPage from './pages/Chat/ChatDetailsPage'
 import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { SidebarProvider } from './contexts/SidebarContext'
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ChatContextProvider } from './contexts/ChatContext'
-
-
-const client = new ApolloClient(
-  {
-    uri: import.meta.env.VITE_BASE_URL || "localhost:4000",
-    cache: new InMemoryCache()
-  }
-)
-
-
 
 function App() {
   return (
-    <ApolloProvider client={client}>
     <SpinnerProvider>
     <DialogProvider>  
     <SidebarProvider>
@@ -46,7 +34,6 @@ function App() {
     </SidebarProvider>
     </DialogProvider>
     </SpinnerProvider>
-    </ApolloProvider>
   )
 }
 
