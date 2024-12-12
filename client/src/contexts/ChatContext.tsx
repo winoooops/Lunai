@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION, CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT, CREATE_TEXT_REPLY_FROM_PROMPT, DELETE_CHAT, GET_CHAT, GET_CHATS, MESSAGE_STREAM, MESSAGE_STREAM_COMPLETE, UPDATE_CHAT } from "../graphql/operations";
+import { ApolloError, DocumentNode, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 import { useSpinnerContext } from "./SpinnerContext";
+import { GET_CHATS } from "@/graphql/operations";
+import { CreateStreamedTextReplyFromConversationDocument, CreateTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamCompleteDocument, OnMessageStreamDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
 
 interface ChatContextProps {
   chats: Chat[];
@@ -34,18 +35,18 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
 
 
-  const { data: chatsData, refetch: refetchChatsData } = useQuery(GET_CHATS);
-  const [getChat, { loading: getChatLoading, error: getChatError }] = useLazyQuery(GET_CHAT);
+  const { data: chatsData, refetch: refetchChatsData } = useQuery(GetChatsDocument);
+  const [getChat, { loading: getChatLoading, error: getChatError }] = useLazyQuery(GetChatDocument, { fetchPolicy: 'network-only' });
 
-  const [updateChat, { loading: updateChatLoading, error: updateChatError }] = useMutation(UPDATE_CHAT);
-  const [deleteChat] = useMutation(DELETE_CHAT);
+  const [updateChat, { loading: updateChatLoading, error: updateChatError }] = useMutation(UpdateChatDocument);
+  const [deleteChat] = useMutation(DeleteChatDocument);
 
-  const [createTextReplyFromPrompt] = useMutation(CREATE_TEXT_REPLY_FROM_PROMPT);
-  const [createStreamedTextReplyFromConversation] = useMutation(CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION);
+  const [createTextReplyFromPrompt] = useMutation(CreateTextReplyFromPromptDocument);
+  const [createStreamedTextReplyFromConversation] = useMutation(CreateStreamedTextReplyFromConversationDocument);
 
 
-  const { data: messageStreamData, error: messageStreamError } = useSubscription(MESSAGE_STREAM);
-  const { data: messageStreamCompleteData, error: messageStreamCompleteError } = useSubscription(MESSAGE_STREAM_COMPLETE);
+  const { data: messageStreamData, error: messageStreamError } = useSubscription(OnMessageStreamDocument);
+  const { data: messageStreamCompleteData, error: messageStreamCompleteError } = useSubscription(OnMessageStreamCompleteDocument);
 
   /**
    * function to send textreply  
@@ -70,8 +71,9 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(errors[0].message);
       }
 
-      if(data.createStreamedTextReplyFromConversation.chatId) {
-        setLocalMessages((prev) => [...prev, data.createStreamedTextReplyFromConversation]);
+
+      if(data && data.createStreamedTextReplyFromConversation && data.createStreamedTextReplyFromConversation.chatId) {
+        setLocalMessages((prev) => [...prev, data.createStreamedTextReplyFromConversation as Message]);
       }
 
 
@@ -83,7 +85,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         throw new Error(errors[0].message);
       }
 
-      if(data.createTextReplyFromPrompt.chatId) {
+      if(data && data.createTextReplyFromPrompt && data.createTextReplyFromPrompt.chatId) {
         refetchChats();
         
         routingCallback(`/chat/${data.createTextReplyFromPrompt.chatId}`);
@@ -96,7 +98,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
    */
   useEffect(() => {
     if(chatsData && chatsData.chats) {
-      setChats(chatsData.chats);
+      setChats(chatsData.chats as Chat[]);
     }
 
     return () => setChats([]);
@@ -114,12 +116,11 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         
         const { data } = await getChat({ 
           variables: { id: activeChatId },
-          fetchPolicy: 'network-only' // Force fetch from network instead of cache
         });
 
         if(data && data.getChat) {
-          setActiveChat(data.getChat);
-          setLocalMessages(data.getChat.messages);
+          setActiveChat(data.getChat as Chat);
+          setLocalMessages(data.getChat.messages as Message[]);
         }
       }
     }
@@ -159,8 +160,9 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     if(messageStreamData && messageStreamData.messageStream) {
       setPendingText((prev) => ({
-        chatId: prev.chatId ? prev.chatId : messageStreamData.messageStream.chatId,
-        text: prev.text + messageStreamData.messageStream.content[0].text
+        // TODO: fix this 
+        chatId: prev.chatId ? prev.chatId : messageStreamData.messageStream?.chatId ?? "",
+        text: prev.text + (messageStreamData.messageStream?.content?.[0]?.text ?? "")
       }));
     }
   },[messageStreamData]);

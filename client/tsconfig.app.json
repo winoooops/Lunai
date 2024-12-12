@@ -24,8 +24,18 @@
     /* types path */
     "paths": {
       "@/*": ["./*"],
-      "@LunaiTypes/*": ["../../@types/shared/*"]
-    }
+      "@LunaiTypes/*": ["../../@types/shared/*"],
+      "@GraphQL/*": ["../../@graphql/schema/*"]
+    },
+
+    /* plugins */
+    "plugins": [
+      {
+        "name": "@0no-code/graphqlsp",
+        "schema": "./schema.graphql",
+      }
+    ]
+
   },
-  "include": ["src/**/*", "../@types/**/*"]
+  "include": ["src/**/*", "../@types/**/*", "../../@graphql/schema/**/*"],
 }

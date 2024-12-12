@@ -4,8 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "graphql-generate": "npx graphql-codegen --config codegen.ts",
+    "graphql-watch": "npx graphql-codegen --config codegen.ts --watch",
+    "dev": "npm run graphql-generate && vite --host 0.0.0.0 ",
+    "build": "npm run graphql-generate && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -22,7 +24,11 @@
     "tw-elements": "^2.0.0"
   },
   "devDependencies": {
+    "@0no-co/graphqlsp": "^1.12.16",
     "@eslint/js": "^9.9.0",
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/schema-ast": "^4.1.0",
+    "@parcel/watcher": "^2.5.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

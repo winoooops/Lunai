@@ -1,17 +1,17 @@
-import { gql } from "@apollo/client";
+import { graphql } from "./generated";
 
-export const GET_CHATS = gql`
+export const GET_CHATS = graphql(`
   query GetChats {
     chats {
       id
       title
       created_at
       updated_at
-    } 
+    }
   }
-`;
+`);
 
-export const GET_MESSAGES = gql`
+export const GET_MESSAGES = graphql(`
   query GetMessages {
     messages {
       content {
@@ -24,9 +24,10 @@ export const GET_MESSAGES = gql`
       model
     }
   }
-`;
+`);
 
-export const GET_MESSAGES_BY_CHAT = gql`
+
+export const GET_MESSAGES_BY_CHAT = graphql(`
   query MessagesFromChat($chatId: String!) {
     messagesFromChat(chatId: $chatId) {
       id
@@ -39,9 +40,9 @@ export const GET_MESSAGES_BY_CHAT = gql`
       }
     }
   }
-`;
+`);
 
-export const GET_CHAT = gql`
+export const GET_CHAT = graphql(`
   query GetChat($id: String!) {
     getChat(id: $id) {
       id
@@ -59,9 +60,10 @@ export const GET_CHAT = gql`
       }
     }
   }
-`;
+`); 
 
-export const UPDATE_CHAT = gql`
+
+export const UPDATE_CHAT = graphql(`
   mutation UpdateChat($updateChatId: String!, $input: ChatInput!) {
     updateChat(id: $updateChatId, input: $input) {
       id
@@ -75,9 +77,9 @@ export const UPDATE_CHAT = gql`
       }
     }
   }
-`;
+`);
 
-export const CREATE_TEXT_REPLY_FROM_PROMPT = gql`
+export const CREATE_TEXT_REPLY_FROM_PROMPT = graphql(`
   mutation CreateTextReplyFromPrompt($prompt: String!) {
     createTextReplyFromPrompt(prompt: $prompt) {
       id
@@ -91,9 +93,9 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = gql`
       }
     }
   }
-`
+`);
 
-export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
+export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
   mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
     createStreamedTextReplyFromPrompt(prompt: $prompt) {
       id
@@ -107,9 +109,9 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = gql`
       model
     }
   }
-`;
+`);
 
-export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = gql`
+export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = graphql(`
   mutation CreateStreamedTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createStreamedTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
       id
@@ -123,9 +125,9 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = gql`
       model
     }
   }
-`;
+`);
 
-export const CREATE_TEXT_REPLY_FROM_CONVERSATION = gql`
+export const CREATE_TEXT_REPLY_FROM_CONVERSATION = graphql(`
   mutation CreateTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
       id
@@ -139,15 +141,15 @@ export const CREATE_TEXT_REPLY_FROM_CONVERSATION = gql`
       timestamp
     }
   }
-`;
+`);
 
-export const DELETE_CHAT = gql`
+export const DELETE_CHAT = graphql(`
   mutation DeleteChat($id: String!) {
     deleteChat(id: $id)
   }
-`
+`);
 
-export const MESSAGE_STREAM = gql`
+export const MESSAGE_STREAM = graphql(`
   subscription OnMessageStream {
     messageStream {
       messageId
@@ -158,13 +160,13 @@ export const MESSAGE_STREAM = gql`
       chatId
     }
   }
-`;
+`);
 
-export const MESSAGE_STREAM_COMPLETE = gql`
+export const MESSAGE_STREAM_COMPLETE = graphql(`
   subscription OnMessageStreamComplete {
     messageStreamComplete {
       chatId
       finalContent
     }
   }
-`;
+`);

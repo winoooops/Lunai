@@ -34,6 +34,7 @@ const splitLink = split(
 // Create Apollo Client instance
 const client = new ApolloClient({
   link: splitLink,
+  uri: "http://localhost:4001/graphql",
   cache: new InMemoryCache()
 });
 
