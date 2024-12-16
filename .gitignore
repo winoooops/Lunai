@@ -9,7 +9,9 @@
 /client/.env
 
 # Ignore built folder
-/server/dist
+/server/dist/
+/client/src/graphql/generated/
+/client/schema.graphql
 
 # Ignore .vscode settting
 .vscode

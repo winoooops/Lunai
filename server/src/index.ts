@@ -6,17 +6,15 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
-
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { ApolloServer } from "@apollo/server";
-import { MessageSchema } from "./schemas/message.schema";
-import { messageResolvers } from "./resolvers/message.resolver";
-import { ChatSchema } from './schemas/chat.schema';
-import { chatResolvers } from './resolvers/chat.resolver';
 import { PubSub } from "graphql-subscriptions";
+import { loadFiles } from "@graphql-tools/load-files";
+
+import { messageResolvers } from "./resolvers/message.resolver";
+import { chatResolvers } from "./resolvers/chat.resolver";
 import { configResolvers } from "./resolvers/config.resolver";
-import { ConfigSchema } from "./schemas/config.schema";
 
 // load environment variables
 config();
@@ -24,9 +22,13 @@ config();
 // Create a single PubSub instance to be shared
 const pubsub = new PubSub();
 
+// load Graphql type definitions and resolvers 
+const typeDefs = await loadFiles('../@graphql/schema/**/*.graphql');
+const resolvers = [messageResolvers, chatResolvers, configResolvers];
+
 const schema = makeExecutableSchema({
-  typeDefs: [MessageSchema, ChatSchema, ConfigSchema],
-  resolvers: [messageResolvers, chatResolvers, configResolvers]
+  typeDefs,
+  resolvers
 });
 
 const app = express();
