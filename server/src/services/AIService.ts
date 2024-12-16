@@ -6,6 +6,7 @@ import { MessageService } from './message.service';
 import { ChatService } from './chat.service';
 import { Message } from '@LunaiTypes/message';
 import { PubSub } from "graphql-subscriptions";
+import { ConfigService } from './config.service';
 
 config();
 
@@ -61,8 +62,8 @@ export interface BaseAIService {
 
 export const getAIService = (): BaseAIService => {
   if(ANTHROPIC_BASE_URL) {
-    return new AnthropicService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), ANTHROPIC_BASE_URL);
+    return new AnthropicService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), ConfigService.getInstance(), ANTHROPIC_BASE_URL);
   } 
 
-  return new XAIService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), BASE_URL);
+  return new XAIService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), ConfigService.getInstance(), BASE_URL);
 }

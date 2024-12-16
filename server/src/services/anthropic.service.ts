@@ -7,26 +7,30 @@ import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
 import { Message, TextContentBlock } from "@LunaiTypes/message";
 import { PubSub } from "graphql-subscriptions";
+import { ConfigService } from "./config.service";
+import { Config } from "@LunaiTypes/config";
 
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
   private chatService: ChatService;
+  private config: Config;
 
-  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, baseURL?: string) {
+  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
       apiKey,
       baseURL
     });
     this.messageService = messageService;
     this.chatService = chatService;
+    this.config = configService.getConfig();
   }
 
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {
     try {
       const promptMessage: Message = {
-        model: "grok-beta",
+        model: this.config.model,
         role: "user",
         timestamp: new Date().toISOString(),
         id: uuidv4(),
@@ -45,8 +49,8 @@ class AnthropicService implements BaseAIService {
 
       const response = await this.anthropicInstance.messages.create({
         model: "grok-beta",
-        max_tokens: 128,
-        system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
+        max_tokens: this.config.max_tokens,
+        system: this.config.system,
         messages: ([...messages, promptMessage] as MessageParam[]), 
       })
   
@@ -55,7 +59,7 @@ class AnthropicService implements BaseAIService {
         role: response.role,
         timestamp: new Date().toISOString(),
         id:uuidv4(),
-        model: "grok-beta",
+        model: response.model,
         chatId 
       }
 
@@ -98,9 +102,7 @@ class AnthropicService implements BaseAIService {
   async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
     try {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
-      
       return this.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);
-      
     } catch (error) {
       console.error("Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ", error);
       throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromPrompt: ${error}`);
@@ -109,67 +111,67 @@ class AnthropicService implements BaseAIService {
 
   async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
     try {
-    const promptMessage: Message = {
-      model: "grok-beta",
-      role: "user",
-      timestamp: new Date().toISOString(),
-      id: uuidv4(),
-      content: [{ type: "text", text: prompt }],
-      chatId
-    };
+      const promptMessage: Message = {
+        model: this.config.model,
+        role: "user",
+        timestamp: new Date().toISOString(),
+        id: uuidv4(),
+        content: [{ type: "text", text: prompt }],
+        chatId
+      };
 
-    this.messageService.addMessage(promptMessage);
-    this.chatService.appendMessage(chatId, promptMessage);
+      this.messageService.addMessage(promptMessage);
+      this.chatService.appendMessage(chatId, promptMessage);
 
-    // get the previous messages
-    const messages = this.chatService.getChatById(chatId)?.messages || [];
+      // get the previous messages
+      const messages = this.chatService.getChatById(chatId)?.messages || [];
 
-    let accumulatedContent = '';
-    let finalMessage: Message;
-    const messageId = uuidv4();
+      let accumulatedContent = '';
+      let finalMessage: Message;
+      const messageId = uuidv4();
 
-    const stream = await this.anthropicInstance.messages
-      .stream({
-        model: "grok-beta",
-        max_tokens: 128,
-        system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-        messages: ([...messages, promptMessage] as MessageParam[]),
-      })
-      .on("text", (content) => {
-        accumulatedContent += content;
-        pubsub.publish("MESSAGE_STREAM", {
-          messageStream: {
-            content: [{ type: "text", text: content }],
-            messageId: messageId,
+      const stream = await this.anthropicInstance.messages
+        .stream({
+          model: this.config.model,
+          max_tokens: this.config.max_tokens,
+          system: this.config.system,
+          messages: ([...messages, promptMessage] as MessageParam[]),
+        })
+        .on("text", (content) => {
+          accumulatedContent += content;
+          pubsub.publish("MESSAGE_STREAM", {
+            messageStream: {
+              content: [{ type: "text", text: content }],
+              messageId: messageId,
+              chatId
+            }
+          });
+        })
+        .on("message", (_: any) => {
+          // Publish completion event
+          pubsub.publish("MESSAGE_STREAM_COMPLETE", {
+            messageStreamComplete: {
+              chatId,
+              finalContent: accumulatedContent
+            }
+          });
+
+          // Save the final message
+          finalMessage = {
+            content: [{ type: "text", text: accumulatedContent }],
+            role: "assistant",
+            timestamp: new Date().toISOString(),
+            id: messageId,
+            model: this.config.model,
             chatId
-          }
-        });
-      })
-      .on("message", (_: any) => {
-        // Publish completion event
-        pubsub.publish("MESSAGE_STREAM_COMPLETE", {
-          messageStreamComplete: {
-            chatId,
-            finalContent: accumulatedContent
-          }
+          };
+
+          this.messageService.addMessage(finalMessage);
+          this.chatService.appendMessage(chatId, finalMessage);
         });
 
-        // Save the final message
-        finalMessage = {
-          content: [{ type: "text", text: accumulatedContent }],
-          role: "assistant",
-          timestamp: new Date().toISOString(),
-          id: messageId,
-          model: "grok-beta",
-          chatId
-        };
-
-        this.messageService.addMessage(finalMessage);
-        this.chatService.appendMessage(chatId, finalMessage);
-      });
-
-    await stream.finalMessage();
-    return finalMessage!;
+      await stream.finalMessage();
+      return finalMessage!;
     } catch (error) {
       console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
       throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);

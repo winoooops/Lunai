@@ -15,6 +15,8 @@ import { messageResolvers } from "./resolvers/message.resolver";
 import { ChatSchema } from './schemas/chat.schema';
 import { chatResolvers } from './resolvers/chat.resolver';
 import { PubSub } from "graphql-subscriptions";
+import { configResolvers } from "./resolvers/config.resolver";
+import { ConfigSchema } from "./schemas/config.schema";
 
 // load environment variables
 config();
@@ -23,8 +25,8 @@ config();
 const pubsub = new PubSub();
 
 const schema = makeExecutableSchema({
-  typeDefs: [MessageSchema, ChatSchema],
-  resolvers: [messageResolvers, chatResolvers]
+  typeDefs: [MessageSchema, ChatSchema, ConfigSchema],
+  resolvers: [messageResolvers, chatResolvers, configResolvers]
 });
 
 const app = express();

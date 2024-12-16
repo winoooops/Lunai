@@ -8,14 +8,16 @@ import { GraphQLError } from "graphql";
 import { Message } from "@LunaiTypes/message";
 import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai";
 import { PubSub } from "graphql-subscriptions";
+import { ConfigService } from "./config.service";
+import { Config } from "@LunaiTypes/config";
 
 class XAIService implements BaseAIService {
   private client: AxiosInstance;
   private messageService: MessageService;
   private chatService: ChatService;
-  model: string;
+  private config: Config;
 
-  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, baseURL?: string, model?: string) {
+  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, baseURL?: string, model?: string) {
     this.client = axios.create({
       baseURL: baseURL ? baseURL : "https://api.x.ai/v1",
       headers: {
@@ -24,9 +26,9 @@ class XAIService implements BaseAIService {
       }
     });
 
-    this.model = model || "grok-beta";
     this.messageService = messageService; 
     this.chatService = chatService;
+    this.config = configService.getConfig();
   }
   createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
     throw new Error("Method not implemented.");
@@ -38,7 +40,7 @@ class XAIService implements BaseAIService {
         id: uuidv4(),
         timestamp: new Date().toISOString(),
         role: "user",
-        model: this.model,
+        model: this.config.model,
         content: [
           {
             text: prompt,
@@ -58,7 +60,7 @@ class XAIService implements BaseAIService {
         messages: [
           {
             role: "system",
-            content: "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
+            content: this.config.system
           },
           [
             ...messages.map(message => ({
@@ -68,7 +70,7 @@ class XAIService implements BaseAIService {
             promptMessage
           ]
         ],
-        model: this.model,
+        model: this.config.model,
         stream: false,
         temperature: 0
       });
