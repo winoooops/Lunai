@@ -61,17 +61,17 @@ export class ModelService {
   }
 
   public setActiveModel(id: string): boolean {
+    // deactivate current active model
     if(this.activeModel) {
       this.activeModel.active = false;
     }
-    
-    this.models.forEach((model) => {
-      if(model.id === id) {
-        model.active = true;
-        this.activeModel = model;
-        return true;
-      }
-    });
+
+    const target = this.models.find((model) => model.id === id);
+    if(target) {
+      target.active = true;
+      this.activeModel = target;
+      return true;
+    }
 
     return false;
   }
@@ -96,7 +96,7 @@ export class ModelService {
       {name: "claude-instant-1.2", owned_by: "anthropic"},
     ]);
 
-    this.addXaiModels();
+    await this.addXaiModels();
   }
 
   private async addXaiModels() {
@@ -109,7 +109,7 @@ export class ModelService {
       });
       const models = modelsResponse.data.data;
 
-      this.addModels(models.map((model: any) => ({id: uuidv4(), name: model.id, owned_by: model.owned_by})));
+      this.addModels(models.map((model: any) => ({name: model.id, owned_by: model.owned_by})));
     } catch (error) {
       console.error("Error fetching models from XAI API:", error);
     }
