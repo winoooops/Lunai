@@ -15,7 +15,7 @@ class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
   private chatService: ChatService;
-  private config: Config;
+  private configService: ConfigService;
   private modelService: ModelService;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string) {
@@ -25,14 +25,14 @@ class AnthropicService implements BaseAIService {
     });
     this.messageService = messageService;
     this.chatService = chatService;
-    this.config = configService.getConfig();
+    this.configService = configService;
     this.modelService = modelService;
   }
 
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {
     try {
       const promptMessage: Message = {
-        model: this.config.model,
+        model: this.modelService.getActiveModelName(),
         role: "user",
         timestamp: new Date().toISOString(),
         id: uuidv4(),
@@ -50,9 +50,9 @@ class AnthropicService implements BaseAIService {
       const messages = this.chatService.getChatById(chatId)?.messages || [];  
 
       const response = await this.anthropicInstance.messages.create({
-        model: "grok-beta",
-        max_tokens: this.config.max_tokens,
-        system: this.config.system,
+        ...this.configService.getConfig(),
+        stream: false,
+        model: this.modelService.getActiveModelName(),
         messages: ([...messages, promptMessage] as MessageParam[]), 
       })
   
@@ -114,7 +114,7 @@ class AnthropicService implements BaseAIService {
   async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
     try {
       const promptMessage: Message = {
-        model: this.config.model,
+        model: this.modelService.getActiveModelName(),
         role: "user",
         timestamp: new Date().toISOString(),
         id: uuidv4(),
@@ -134,9 +134,8 @@ class AnthropicService implements BaseAIService {
 
       const stream = await this.anthropicInstance.messages
         .stream({
-          model: this.config.model,
-          max_tokens: this.config.max_tokens,
-          system: this.config.system,
+          ...this.configService.getConfig(),
+          model: this.modelService.getActiveModelName(),
           messages: ([...messages, promptMessage] as MessageParam[]),
         })
         .on("text", (content) => {
@@ -164,7 +163,7 @@ class AnthropicService implements BaseAIService {
             role: "assistant",
             timestamp: new Date().toISOString(),
             id: messageId,
-            model: this.config.model,
+            model: this.modelService.getActiveModelName(),
             chatId
           };
 

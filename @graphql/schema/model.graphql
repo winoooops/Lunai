@@ -12,8 +12,9 @@ input ModelInput {
 
 type Query {
   models: [Model]!
-  modelByName(name: String!): Model
   activeModel: Model
+  activeModelName: String
+  modelByName(name: String!): Model
 }
 
 type Mutation {

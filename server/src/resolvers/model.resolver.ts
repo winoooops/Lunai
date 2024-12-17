@@ -11,9 +11,13 @@ export const modelResolvers = {
       const modelService = ModelService.getInstance();
       return modelService.getModelByName(name);
     },
-    activeModel: async (_: any) => {
+    activeModel: async () => {
       const modelService = ModelService.getInstance();
       return modelService.getActiveModel();
+    },
+    activeModelName: async () => {
+      const modelService = ModelService.getInstance();
+      return modelService.getActiveModelName();
     }
   },
   Mutation: {

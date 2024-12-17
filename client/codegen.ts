@@ -12,6 +12,7 @@ const config: CodegenConfig = {
       preset: "client",
       config: {
         documentMode: "documentNode",
+        typesPrefix: "GQL",
       },
     },
     "./schema.graphql": {

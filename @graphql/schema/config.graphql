@@ -3,7 +3,6 @@ type Config {
   temperature: Float!
   stream: Boolean!
   system: String!
-  model: String!
 }
 
 input ConfigInput {
@@ -11,12 +10,10 @@ input ConfigInput {
   temperature: Float
   stream: Boolean
   system: String
-  model: String
 }
 
 type Query {
   config: Config!
-  availableModels: [String!]!
 } 
 
 type Mutation {

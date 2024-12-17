@@ -9,6 +9,7 @@ import ChatNewPage from './pages/Chat/ChatNewPage'
 import ChatLayout from './pages/Chat/ChatLayout'
 import { SidebarProvider } from './contexts/SidebarContext'
 import { ChatContextProvider } from './contexts/ChatContext'
+import { ConfigProvider } from './contexts/ConfigContext'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
     <SidebarProvider>
     <DnDContextProvider>
     <ChatContextProvider>  
+    <ConfigProvider>
       <Router>
         <Layout>
           <Routes>
@@ -29,6 +31,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>  
+    </ConfigProvider>
     </ChatContextProvider>  
     </DnDContextProvider>  
     </SidebarProvider>

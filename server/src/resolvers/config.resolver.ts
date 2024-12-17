@@ -6,10 +6,6 @@ export const configResolvers = {
     config: (): Config => {
       const configService = ConfigService.getInstance();
       return configService.getConfig();
-    },
-    availableModels: (): string[] => {
-      const configService = ConfigService.getInstance();
-      return configService.getAvailableModels();
     }
   }, 
   Mutation: {

@@ -1,18 +1,11 @@
+import React from "react";
 import { GrFormDown } from "react-icons/gr";
 import { DialogButton } from "../../../ui/Dialog";
-import React, { useEffect, useState } from "react";
 import { useDialog } from "../../../contexts/DialogContext";
+import { useConfigContext } from "../../../contexts/ConfigContext";
+import { Model } from "@LunaiTypes/model";
 
-interface ModelItem {
-  id: number;
-  name: string;
-  label: string;
-  description?: string;
-}
-
-
-const ModelList: React.FC<{ models: ModelItem[], onSelect: (model: ModelItem) => void }> = ({ models, onSelect }) => {
-
+const ModelList: React.FC<{ models: Model[], onSelect: (model: Model) => void }> = ({ models, onSelect }) => {
   return (
     <ul className="p-2 bg-slate-700 rounded" id="model-selctor">
       { models?.map(item => 
@@ -22,29 +15,20 @@ const ModelList: React.FC<{ models: ModelItem[], onSelect: (model: ModelItem) =>
           className="px-2 py-1 font-semibold text-lg rounded text-slate-200 transition-all duration-200 hover:scale-105 hover:text-yellow-300 hover:bg-slate-900"
           onClick={() => onSelect(item)}
         >
-          {item.label}
+          {item.name}
         </li>)} 
     </ul>
   );
 }
 
 
-
 const ModelSelector: React.FC = () => {
-  const [activeModel, setActiveModel] = useState<ModelItem | undefined>(undefined);
+  const { models, activeModel, handleSetActiveModel } = useConfigContext();
   const { closeDialog } = useDialog();
+  
 
-  const models: ModelItem[] = [
-    { id: 1, name: "model 1", label: "model 1" },
-    { id: 2, name: "model 2", label: "model 2"}
-  ]
-
-  useEffect(() => {
-    setActiveModel(models[0]);
-  },[])
-
-  const handleSelect = (model: ModelItem) => {
-    setActiveModel(model);
+  const handleSelect = (model: Model) => {
+    handleSetActiveModel(model);
     closeDialog();
   }
 
@@ -57,7 +41,7 @@ const ModelSelector: React.FC = () => {
           className="group px-2 py-1 flex gap-1 items-center bg-slate-900 hover:bg-slate-800 hover:text-slate-200 " 
           variation="dropup"
         >
-          {activeModel?.label}
+          {activeModel?.name}
           <GrFormDown className="text-slate-900 group-hover:text-slate-200"/>
         </DialogButton>
       </div>

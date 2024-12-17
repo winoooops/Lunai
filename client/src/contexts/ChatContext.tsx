@@ -75,8 +75,6 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if(data && data.createStreamedTextReplyFromConversation && data.createStreamedTextReplyFromConversation.chatId) {
         setLocalMessages((prev) => [...prev, data.createStreamedTextReplyFromConversation as Message]);
       }
-
-
     } else {
       // getting text reply from prompt
       const { data, errors } = await createTextReplyFromPrompt({ variables: { prompt }});

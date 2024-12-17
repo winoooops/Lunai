@@ -9,7 +9,6 @@ import { Message } from "@LunaiTypes/message";
 import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai";
 import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from "./config.service";
-import { Config } from "@LunaiTypes/config";
 import { ModelService } from "./model.service";
 import { axiosFactory } from "@/utils/axiosFactory";
 
@@ -17,7 +16,7 @@ class XAIService implements BaseAIService {
   private client: AxiosInstance;
   private messageService: MessageService;
   private chatService: ChatService;
-  private config: Config;
+  private configService: ConfigService;
   private modelService: ModelService;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string, model?: string) {
@@ -25,7 +24,7 @@ class XAIService implements BaseAIService {
 
     this.messageService = messageService; 
     this.chatService = chatService;
-    this.config = configService.getConfig();
+    this.configService = configService;
     this.modelService = modelService;
   }
   createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
@@ -38,7 +37,7 @@ class XAIService implements BaseAIService {
         id: uuidv4(),
         timestamp: new Date().toISOString(),
         role: "user",
-        model: this.config.model,
+        model: this.modelService.getActiveModelName(),
         content: [
           {
             text: prompt,
@@ -58,7 +57,7 @@ class XAIService implements BaseAIService {
         messages: [
           {
             role: "system",
-            content: this.config.system
+            content: this.configService.getConfig().system
           },
           [
             ...messages.map(message => ({
@@ -68,9 +67,9 @@ class XAIService implements BaseAIService {
             promptMessage
           ]
         ],
-        model: this.config.model,
-        stream: false,
-        temperature: 0
+        model: this.modelService.getActiveModelName(),
+        ...this.configService.getConfig(),
+        stream: false
       });
 
       // Construct the message object from the API response

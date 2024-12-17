@@ -10,7 +10,6 @@ export class ConfigService {
       temperature: 0.5,
       stream: true,
       system: "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy.",
-      model: "grok-beta"
     }
   }
 

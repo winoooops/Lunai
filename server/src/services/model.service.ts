@@ -28,7 +28,12 @@ export class ModelService {
   }
 
   public async getModels(): Promise<Model[]> {
-    return this.models;
+    // active models should be at the top
+    return this.models.sort((a, b) => {
+      if(a.active && !b.active) return -1;
+      if(!a.active && b.active) return 1;
+      return 0;
+    });
   }
 
   public async setModels(models: ModelInput[]): Promise<Model[]> {
@@ -78,6 +83,10 @@ export class ModelService {
 
   public getActiveModel(): Model | null {
     return this.activeModel;
+  }
+
+  public getActiveModelName(): string {
+    return this.activeModel?.name || "grok-beta";
   }
 
   private async initModels(): Promise<void> {

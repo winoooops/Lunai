@@ -16,9 +16,4 @@ export interface Config {
    * system prompt is a way of providing context and instructions to the model, such as specifying particular goal or role.
    */
   system: string;
-
-  /**
-   * model is the name of the model to use for the chat.
-   */
-  model: string;
 }

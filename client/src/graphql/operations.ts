@@ -170,3 +170,54 @@ export const MESSAGE_STREAM_COMPLETE = graphql(`
     }
   }
 `);
+
+
+export const GET_CONFIG = graphql(`
+  query GetConfig {
+    config {
+      system
+      max_tokens
+      temperature
+      stream
+    }
+  }
+`);
+
+export const SET_CONFIG = graphql(`
+  mutation SetConfig($config: ConfigInput!) {
+    setConfig(config: $config) {
+      system
+      max_tokens
+      temperature
+      stream
+    }
+  }
+`);
+
+export const GET_MODELS = graphql(`
+  query GetModels {
+    models {
+      id
+      name
+      owned_by
+      active
+    }
+  }
+`);
+
+export const GET_ACTIVE_MODEL = graphql(`
+  query GetActiveModel {
+    activeModel {
+      id
+      name
+      owned_by
+      active
+    }
+  }
+`);
+
+export const SET_ACTIVE_MODEL = graphql(`
+  mutation SetActiveModel($id: String!) {
+    setActiveModel(id: $id)
+  }
+`);
