@@ -1,0 +1,26 @@
+type Model {
+  id: String!
+  name: String!
+  owned_by: String!
+  active: Boolean
+}
+
+input ModelInput {
+  name: String!
+  owned_by: String!
+}
+
+type Query {
+  models: [Model]!
+  modelByName(name: String!): Model
+  activeModel: Model
+}
+
+type Mutation {
+  setModels(modelInputs: [ModelInput!]!): [Model]!
+  addModel(modelInput: ModelInput!): [Model]!
+  addModels(modelInputs: [ModelInput!]!): [Model]!
+  removeModelByName(name: String!): [Model]!
+  removeModelById(id: String!): [Model]!
+  setActiveModel(id: String!): Boolean
+}

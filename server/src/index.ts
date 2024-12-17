@@ -15,6 +15,7 @@ import { loadFiles } from "@graphql-tools/load-files";
 import { messageResolvers } from "./resolvers/message.resolver";
 import { chatResolvers } from "./resolvers/chat.resolver";
 import { configResolvers } from "./resolvers/config.resolver";
+import { modelResolvers } from "./resolvers/model.resolver";
 
 // load environment variables
 config();
@@ -24,7 +25,7 @@ const pubsub = new PubSub();
 
 // load Graphql type definitions and resolvers 
 const typeDefs = await loadFiles('../@graphql/schema/**/*.graphql');
-const resolvers = [messageResolvers, chatResolvers, configResolvers];
+const resolvers = [messageResolvers, chatResolvers, configResolvers, modelResolvers];
 
 const schema = makeExecutableSchema({
   typeDefs,

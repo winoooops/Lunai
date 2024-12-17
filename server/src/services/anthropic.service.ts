@@ -2,22 +2,23 @@ import Anthropic from "@anthropic-ai/sdk";
 import { v4 as uuidv4 } from "uuid";
 
 import { BaseAIService } from "./AIService";
-import { MessageParam } from "@anthropic-ai/sdk/resources";
+import { MessageParam, Model } from "@anthropic-ai/sdk/resources";
 import { MessageService } from "./message.service";
 import { ChatService } from "./chat.service";
 import { Message, TextContentBlock } from "@LunaiTypes/message";
 import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from "./config.service";
 import { Config } from "@LunaiTypes/config";
-
+import { ModelService } from "./model.service";
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
   private messageService: MessageService;
   private chatService: ChatService;
   private config: Config;
+  private modelService: ModelService;
 
-  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, baseURL?: string) {
+  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string) {
     this.anthropicInstance = new Anthropic({
       apiKey,
       baseURL
@@ -25,6 +26,7 @@ class AnthropicService implements BaseAIService {
     this.messageService = messageService;
     this.chatService = chatService;
     this.config = configService.getConfig();
+    this.modelService = modelService;
   }
 
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse, isAxiosError } from "axios";
+import { AxiosInstance, AxiosResponse, isAxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 import { BaseAIService } from "./AIService";
@@ -10,25 +10,23 @@ import { XAIChatCompletionParams, XAICompletionResponse } from "@LunaiTypes/xai"
 import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from "./config.service";
 import { Config } from "@LunaiTypes/config";
+import { ModelService } from "./model.service";
+import { axiosFactory } from "@/utils/axiosFactory";
 
 class XAIService implements BaseAIService {
   private client: AxiosInstance;
   private messageService: MessageService;
   private chatService: ChatService;
   private config: Config;
+  private modelService: ModelService;
 
-  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, baseURL?: string, model?: string) {
-    this.client = axios.create({
-      baseURL: baseURL ? baseURL : "https://api.x.ai/v1",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      }
-    });
+  constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string, model?: string) {
+    this.client = axiosFactory(baseURL? baseURL : "https://api.x.ai/v1", apiKey);
 
     this.messageService = messageService; 
     this.chatService = chatService;
     this.config = configService.getConfig();
+    this.modelService = modelService;
   }
   createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
     throw new Error("Method not implemented.");
