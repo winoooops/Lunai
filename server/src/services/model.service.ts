@@ -13,7 +13,7 @@ export class ModelService {
   constructor() {
     const id = uuidv4();
     this.models = [
-      {id, name: "grok-beta(Anthropic SDK)", owned_by: "anthropic"},
+      {id, name: "grok-beta", owned_by: "anthropic"},
     ];
     this.initModels();
 
