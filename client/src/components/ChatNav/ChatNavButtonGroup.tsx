@@ -4,6 +4,7 @@ import Button from "../../ui/Button";
 import { AiOutlineControl } from "react-icons/ai";
 import { useSidebar } from "../../contexts/SidebarContext";
 import MessageSidebarWrapper from "../../features/Chat/Messages/MessageSidebarWrapper";
+import { ChatConfig } from "@/features/Chat/History/ChatConfig";
 
 const ChatNavButtonGroup: React.FC<{isWidthFixed: boolean}> = ({ isWidthFixed }) => {
   const location = useLocation();
@@ -13,7 +14,7 @@ const ChatNavButtonGroup: React.FC<{isWidthFixed: boolean}> = ({ isWidthFixed })
     if(rightSidebar && rightSidebar.isOpened) {
       closeSidebar(rightSidebar.id);
     } else {
-      openSidebar("right", "right", <MessageSidebarWrapper><div>Cool</div></MessageSidebarWrapper>)
+      openSidebar("right", "right", <MessageSidebarWrapper><ChatConfig /></MessageSidebarWrapper>)
     }
   }
 
