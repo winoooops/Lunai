@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useConfigContext } from "@/contexts/ConfigContext";
+import { useState, useEffect } from "react";
 
 export const ChatConfig = () => {
+  const { config } = useConfigContext();
+
   const [isStream, setIsStream] = useState(false);
   const [maxTokens, setMaxTokens] = useState(256);
   const [temperature, setTemperature] = useState(0.5);
   const [system, setSystem] = useState("");
+
+  useEffect(() => {
+    if(config) {
+      setIsStream(config.stream);
+      setMaxTokens(config.max_tokens);
+      setTemperature(config.temperature);
+      setSystem(config.system);
+    }
+
+    () => {
+      setIsStream(false);
+      setMaxTokens(256);
+      setTemperature(0.5);
+      setSystem("");
+    }
+  }, [config]);
 
   return (
     <form className="">

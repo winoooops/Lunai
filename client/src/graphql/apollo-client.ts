@@ -3,6 +3,12 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 
+if(!import.meta.env.VITE_BASE_URL) {
+  throw new Error("VITE_BASE_URL is not set");
+}
+
+
+
 // Create an HTTP link
 const httpLink = new HttpLink({
   uri: `${import.meta.env.VITE_BASE_URL}/graphql`
