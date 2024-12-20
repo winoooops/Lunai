@@ -16,5 +16,8 @@ module.exports = {
     extend: {},
   },
   darkMode: "class",
-  plugins: [require("tw-elements/plugin.cjs")],
+  plugins: [
+    require("tw-elements/plugin.cjs"),
+    require('@tailwindcss/typography'),
+  ],
 };

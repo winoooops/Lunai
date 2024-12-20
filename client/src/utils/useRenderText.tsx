@@ -14,13 +14,21 @@ export interface LineItem {
 function useTextConvert(text: string): LineItem[] {
   const results: LineItem[] = [];
   const paragraphTexts = text.split("\n\n");
-  const currentList: LineItem[] = [];
+  let currentList: LineItem[] = [];
   let isOrdered: boolean = false;
 
   paragraphTexts.forEach((paragraphText: string) => {
     const lineTexts = paragraphText.split("\n");
     lineTexts.forEach((lineText: string) => {
       let lineItem: LineItem;
+
+      // should handle bold & italic here
+      if(lineText.includes("**")) {
+        lineText = lineText.replace(/\*\*(.*?)\*\*/, "<strong>$1</strong>");
+      }
+      if(lineText.includes("*")) {
+        lineText = lineText.replace(/\*(.*?)\*/, "<em>$1</em>");
+      }
 
       if(lineText.trim().startsWith("-")) {
         isOrdered = false;
@@ -53,14 +61,6 @@ function useTextConvert(text: string): LineItem[] {
             type: "h1",
             textContent: header
           }
-        }
-        // should handle bold text here 
-        else if(lineText.includes("**")) {
-          const boldText = lineText.replace(/\*\*(.*?)\*\*/, "<strong>$1</strong>");
-          lineItem = {
-            type: "p",
-            textContent: boldText
-          }
         } else {
           lineItem = {
             type: "p",
@@ -79,15 +79,13 @@ function useTextConvert(text: string): LineItem[] {
             children: currentList
           }
           results.push(list);
+          currentList = [];
         }
 
         results.push(lineItem);
       }
     });
   });
-
-  console.log(results);
-
   return results;
 }
 
@@ -101,18 +99,18 @@ export function useShowText(text: string) {
 
   return lineItems.map((lineItem: LineItem, index: number) => {
     if(lineItem.type === "h1") {
-      return <h1 key={index} className="text-5xl font-extrabold dark:text-white">{lineItem.textContent}</h1>
+      return <h1 key={index} className="text-3xl font-extrabold dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h1>
     } else if (lineItem.type === "h2") {
-      return <h2 key={index} className="text-4xl font-extrabold dark:text-white">{lineItem.textContent}</h2>
+      return <h2 key={index} className="text-2xl dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h2>
     } else if (lineItem.type === "h3") {
-      return <h3 key={index} className="text-3xl font-extrabold dark:text-white">{lineItem.textContent}</h3>
+      return <h3 key={index} className="text-xl dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h3>
     } else if(lineItem.type === "p") {
-      return <p key={index}>{lineItem.textContent}</p>
+      return <p key={index} className="text-sm text-slate-50" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></p>
     } else if (lineItem.type === "ul") {
       return (
         <ul key={index}>
           {lineItem.children?.map((child: LineItem, childIndex: number) => (
-            <li key={childIndex}>{child.textContent}</li>
+            <li key={childIndex} dangerouslySetInnerHTML={{ __html: child.textContent || "" }}></li>
           ))}
         </ul>
       )
@@ -120,7 +118,7 @@ export function useShowText(text: string) {
       return (
         <ol key={index}>
           {lineItem.children?.map((child: LineItem, childIndex: number) => (
-            <li key={childIndex}>{child.textContent}</li>
+            <li key={childIndex} dangerouslySetInnerHTML={{ __html: child.textContent || "" }}></li>
           ))}
         </ol>
       )
@@ -138,18 +136,18 @@ export function useRenderText(chunk: string) {
 
   return lineItems.map((lineItem: LineItem, index: number) => {
     if(lineItem.type === "h1") {
-      return <h1 key={index} className="text-5xl font-extrabold dark:text-white">{lineItem.textContent}</h1>
+      return <h1 key={index} className="text-5xl font-extrabold dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h1>
     } else if (lineItem.type === "h2") {
-      return <h2 key={index} className="text-4xl font-extrabold dark:text-white">{lineItem.textContent}</h2>
+      return <h2 key={index} className="text-4xl font-extrabold dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h2>
     } else if (lineItem.type === "h3") {
-      return <h3 key={index} className="text-3xl font-extrabold dark:text-white">{lineItem.textContent}</h3>
+      return <h3 key={index} className="text-3xl font-extrabold dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h3>
     } else if (lineItem.type === "p") {
-      return <p key={index} className="text-sm text-slate-50">{lineItem.textContent}</p>
+      return <p key={index} className="text-sm text-slate-50" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></p>
     } else if (lineItem.type === "ul") {
       return (
         <ul key={index}>
           {lineItem.children?.map((child: LineItem, childIndex: number) => (
-            <li key={childIndex}>{child.textContent}</li>
+            <li key={childIndex} dangerouslySetInnerHTML={{ __html: child.textContent || "" }}></li>
           ))}
         </ul>
       )
@@ -157,7 +155,7 @@ export function useRenderText(chunk: string) {
       return (
         <ol key={index}>
           {lineItem.children?.map((child: LineItem, childIndex: number) => (
-            <li key={childIndex}>{child.textContent}</li>
+            <li key={childIndex} dangerouslySetInnerHTML={{ __html: child.textContent || "" }}></li>
           ))}
         </ol>
       )
@@ -171,7 +169,6 @@ export function useRenderText(chunk: string) {
  * @returns {LineItem[]} - The line items
  */
 function useAppendChunkToText(chunk: string): LineItem[] {
-  console.log(`should append ${chunk} to the text`);
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
   let lineItem: LineItem;
 

@@ -202,4 +202,35 @@
   padding-bottom: 1em;
 }
 
+.message-bubble {
+  @apply bg-transparent;
+  @apply text-slate-400;
+  margin: auto;
+}
 
+.message-bubble-user {
+  text-align: right;
+  margin: auto;
+  @apply text-slate-100;
+  @apply rounded-lg;
+}
+
+.text-container {
+  @apply text-sm;
+  @apply text-slate-200;
+}
+
+.text-container p {
+  @apply text-sm;
+  @apply text-slate-50;
+}
+
+.text-container ul {
+  @apply list-disc;
+  @apply list-inside;
+}
+
+.text-container li {
+  @apply text-sm;
+  @apply text-slate-50;
+}
