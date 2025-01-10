@@ -6,12 +6,72 @@ export interface LineItem {
   children?: LineItem[];
 }
 
+interface ParsedContent {
+  isCode: boolean;
+  language?: string;
+  content: string;
+}
+
+export const parseContent = (text: string): ParsedContent[] => {
+  const result: ParsedContent[] = [];
+  const stack: string[] = [];
+  let currentContent: string = "";
+  
+  text.split("\n").forEach((line: string) => {
+    // Add newline to previous content if it's not empty
+    if (currentContent) {
+      currentContent += "\n";
+    }
+
+    const lineText = line;  // Don't trim to preserve formatting
+
+    if (lineText.match(/^```(\w+)/)) {
+      // should push remaining content to result
+      if (currentContent.length > 0) {
+        result.push({
+          isCode: false,
+          content: currentContent.trim()
+        });
+      }
+      
+      currentContent = "";  // Don't include the opening fence in content
+      stack.push(lineText);
+    } else if (lineText.match(/^```/)) {
+      const code = stack.pop()!;
+      const language = code.replace(/^```(\w+)/, "$1");
+      
+      // check if there is a code block wrapping this
+      if (stack.length === 0) {
+        result.push({
+          isCode: true,
+          language,
+          content: currentContent.trim()
+        });
+        currentContent = "";
+      } else {
+        currentContent += lineText;
+      }
+    } else {
+      currentContent += lineText;
+    }
+  });
+
+  if (currentContent.length > 0) {
+    result.push({
+      isCode: false,
+      content: currentContent.trim()
+    });
+  }
+
+  return result;
+};
+
 /**
  * Convert text to line items
  * @param {string} text - The text to convert
  * @returns {LineItem[]} - The line items
  */
-function useTextConvert(text: string): LineItem[] {
+function convertText2LineItems(text: string): LineItem[] {
   const results: LineItem[] = [];
   const paragraphTexts = text.split("\n\n");
   let currentList: LineItem[] = [];
@@ -95,7 +155,8 @@ function useTextConvert(text: string): LineItem[] {
  * @returns {JSX.Element[]} - The rendered text
  */
 export function useShowText(text: string) {
-  const lineItems = useTextConvert(text);
+  const lineItems = convertText2LineItems(text);
+  console.log(lineItems);
 
   return lineItems.map((lineItem: LineItem, index: number) => {
     if(lineItem.type === "h1") {
@@ -131,7 +192,7 @@ export function useShowText(text: string) {
  * @param {string} chunk - The chunk to render
  * @returns {JSX.Element[]} - The rendered text
  */
-export function useRenderText(chunk: string) {
+export function useRenderStreamingText(chunk: string) {
   const lineItems: LineItem[] = useAppendChunkToText(chunk)
 
   return lineItems.map((lineItem: LineItem, index: number) => {
@@ -164,7 +225,7 @@ export function useRenderText(chunk: string) {
 }
 
 /**
- * Append chunk to text
+ * Append chunk to text. This is used for streaming responses
  * @param {string} chunk - The chunk to append
  * @returns {LineItem[]} - The line items
  */

@@ -211,8 +211,6 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     console.log(data);
   }
 
-
-  console.log(messageStreamData);
   if(messageStreamError) {
     console.error(messageStreamError);
   }

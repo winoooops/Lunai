@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useShowText } from '../utils/useRenderText';
+import { useShowText } from '../hooks/useRenderText';
 import { IoCodeSlash } from "react-icons/io5";
 import { MdPreview } from "react-icons/md";
 
@@ -18,6 +18,8 @@ const ContentWrapper: React.FC<ContentWrapperProps> = ({
 }) => {
   const [showRaw, setShowRaw] = useState(false);
   const renderedContent = useShowText(content);
+
+  const isCodeSnippet = isCode && language !== "markdown";
 
   return (
     <div className="relative rounded-lg border border-slate-700 bg-slate-800 shadow-lg mb-4">
@@ -42,7 +44,7 @@ const ContentWrapper: React.FC<ContentWrapperProps> = ({
           </div>
         ) : (
           <div>
-            {isCode ? (
+            {isCodeSnippet ? (
               <SyntaxHighlighter
                 language={language}
                 style={vscDarkPlus}

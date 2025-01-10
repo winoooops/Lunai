@@ -1,5 +1,6 @@
 import { TextContentBlock } from "@LunaiTypes/message";
 import ContentWrapper from "@/ui/ContentWrapper";
+import { parseContent } from "@/hooks/useRenderText";
 
 interface MessageBubbleProps {
   isUser: boolean;
@@ -7,29 +8,8 @@ interface MessageBubbleProps {
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content }) => {
-  const parseContent = (text: string) => {
-    // Check if the content contains a code block
-    const codeBlockMatch = text.match(/^```(\w+)?\n([\s\S]*?)```$/m);
-    
-    if (codeBlockMatch) {
-      const [fullMatch, language = 'text', code] = codeBlockMatch;
-      // Replace only the code block portion, preserving any other text
-      const processedContent = text.replace(fullMatch, code.trim());
-      return {
-        isCode: true,
-        language: language || 'text',
-        content: processedContent
-      };
-    }
-
-    return {
-      isCode: false,
-      content: text
-    };
-  };
-
-  const renderedContent = parseContent(content.text);
-
+  const results = parseContent(content.text);
+  console.log(results);
 
   return (
     <div className={`${isUser ? 'message-bubble-user': 'message-bubble'} mb-4 mx-auto`}>
@@ -37,17 +17,22 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content })
         isUser ? 'bg-slate-900' : 'bg-transparent w-full text-slate-500'
       }`}>
         <div className="text-container">
-          {renderedContent.isCode ? (
-            <ContentWrapper 
-              content={renderedContent.content}
-              language={renderedContent.language}
-              // isCode={renderedContent.isCode}
-            />
-          ) : (
-            <div className="w-full">
-              {renderedContent.content}
-            </div>
-          )}
+          {
+            results.map((result, index) => 
+              result.isCode ? (
+                <ContentWrapper 
+                  key={index}
+                  content={result.content}
+                  language={result.language}
+                  isCode={result.isCode}
+                />
+              ) : (
+                <div className="w-full">
+                  {result.content}
+                </div>
+              )
+            )
+          }
         </div>
       </div>
     </div>
