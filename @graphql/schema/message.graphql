@@ -3,6 +3,10 @@ type TextContentBlock {
     type: String!
   }
 
+type Metadata {
+  reasoning_content: String
+}
+
 type Message {
   content: [TextContentBlock] 
   role: String!
@@ -10,6 +14,7 @@ type Message {
   id: String!
   model: String!
   chatId: String!
+  metadata: Metadata
 }
 
 type MessageStream {
@@ -23,9 +28,22 @@ type MessageStreamComplete {
   finalContent: String!
 }
 
+type ReasoningStream {
+  chatId: String!
+  messageId: String!
+  content: [TextContentBlock]
+}
+
+type ReasoningStreamComplete {
+  chatId: String!
+  finalContent: String!
+}
+
 type Subscription {
   messageStream: MessageStream
   messageStreamComplete: MessageStreamComplete
+  reasoningStream: ReasoningStream
+  reasoningStreamComplete: ReasoningStreamComplete
 }
 
 input TextContentBlockInput {

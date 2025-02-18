@@ -19,12 +19,44 @@ const ContentWrapper: React.FC<ContentWrapperProps> = ({
   const [showRaw, setShowRaw] = useState(false);
   const renderedContent = useShowText(content);
 
-  const isCodeSnippet = isCode && language !== "markdown";
+  const renderContent = () => {
+    if (isCode) {
+      if (language === "markdown") {
+        // For markdown, render the content with markdown parsing
+        return (
+          <div className="prose prose-invert max-w-none">
+            {renderedContent}
+          </div>
+        );
+      } else {
+        // For other code blocks, use syntax highlighting
+        return (
+          <SyntaxHighlighter
+            language={language}
+            style={vscDarkPlus}
+            customStyle={{
+              margin: 0,
+              borderRadius: '0.5rem',
+              background: 'transparent'
+            }}
+          >
+            {content}
+          </SyntaxHighlighter>
+        );
+      }
+    } else {
+      // For regular text content
+      return (
+        <div className="prose prose-invert max-w-none">
+          {renderedContent}
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="relative rounded-lg border border-slate-700 bg-slate-800 shadow-lg mb-4">
       {/* Header with toggle button */}
-      {/* should displya language and file name  */}
       <div className="absolute top-2 right-2 z-10">
         <button
           onClick={() => setShowRaw(!showRaw)}
@@ -35,6 +67,14 @@ const ContentWrapper: React.FC<ContentWrapperProps> = ({
         </button>
       </div>
 
+      {/* Optional language indicator */}
+      {isCode && language && (
+        <div className="absolute top-2 left-2 z-10">
+          <span className="px-2 py-1 rounded bg-slate-700 text-slate-200 text-xs">
+            {language}
+          </span>
+        </div>
+      )}
 
       {/* Content area */}
       <div className="p-4">
@@ -43,25 +83,7 @@ const ContentWrapper: React.FC<ContentWrapperProps> = ({
             {content}
           </div>
         ) : (
-          <div>
-            {isCodeSnippet ? (
-              <SyntaxHighlighter
-                language={language}
-                style={vscDarkPlus}
-                customStyle={{
-                  margin: 0,
-                  borderRadius: '0.5rem',
-                  background: 'transparent'
-                }}
-              >
-                {content}
-              </SyntaxHighlighter>
-            ) : (
-              <div className="prose prose-invert max-w-none">
-                {renderedContent}
-              </div>
-            )}
-          </div>
+          renderContent()
         )}
       </div>
     </div>

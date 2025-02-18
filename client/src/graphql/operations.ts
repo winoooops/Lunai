@@ -221,3 +221,25 @@ export const SET_ACTIVE_MODEL = graphql(`
     setActiveModel(id: $id)
   }
 `);
+
+export const REASONING_STREAM = graphql(`
+  subscription OnReasoningStream {
+    reasoningStream {
+      messageId
+      content {
+        type
+        text
+      }
+      chatId
+    }
+  }
+`); 
+
+export const REASONING_STREAM_COMPLETE = graphql(`
+  subscription OnReasoningStreamComplete {
+    reasoningStreamComplete {
+      chatId
+      finalContent
+    }
+  }
+`);

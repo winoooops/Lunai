@@ -10,4 +10,5 @@ export interface Message {
   id: string;
   model: string; 
   chatId: string;
+  metadata?: Record<string, any>;
 }

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { v4 as uuidv4 } from "uuid";
+import axios from 'axios';
 
 import { BaseAIService } from "./AIService";
 import { MessageParam, Model } from "@anthropic-ai/sdk/resources";

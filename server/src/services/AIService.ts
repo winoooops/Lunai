@@ -8,12 +8,15 @@ import { Message } from '@LunaiTypes/message';
 import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from './config.service';
 import { ModelService } from './model.service';
+import DeepSeekService from './deepseek.service';
 
 config();
 
 const API_KEY = process.env.XAI_API_KEY;
 const BASE_URL = process.env.XAI_BASE_URL;
 const ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL; 
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 if(!API_KEY) {
   throw new Error("Failed to load API key from .env file, plz double check the file.");
@@ -62,6 +65,10 @@ export interface BaseAIService {
 }
 
 export const getAIService = (): BaseAIService => {
+  if(DEEPSEEK_BASE_URL && DEEPSEEK_API_KEY) {
+    return new DeepSeekService(DEEPSEEK_API_KEY, MessageService.getInstance(), ChatService.getInstance(), ConfigService.getInstance(), ModelService.getInstance(), DEEPSEEK_BASE_URL);
+  }
+
   if(ANTHROPIC_BASE_URL) {
     return new AnthropicService(API_KEY, MessageService.getInstance(), ChatService.getInstance(), ConfigService.getInstance(), ModelService.getInstance(), ANTHROPIC_BASE_URL);
   } 

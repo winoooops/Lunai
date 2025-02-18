@@ -13,7 +13,8 @@ export class ModelService {
   constructor() {
     const id = uuidv4();
     this.models = [
-      {id, name: "grok-beta", owned_by: "anthropic"},
+      {id, name: "deepseek-ai/DeepSeek-R1", owned_by: "deepseek"},
+      // {id, name: "grok-beta", owned_by: "anthropic"},
     ];
     this.initModels();
 
@@ -105,7 +106,7 @@ export class ModelService {
       {name: "claude-instant-1.2", owned_by: "anthropic"},
     ]);
 
-    await this.addXaiModels();
+    // await this.addXaiModels();
   }
 
   private async addXaiModels() {
