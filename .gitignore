@@ -15,3 +15,9 @@
 
 # Ignore .vscode settting
 .vscode
+
+# Ignore lock files 
+/server/package-lock.json
+/server/yarn.lock
+/client/package-lock.json
+/client/yarn.lock
