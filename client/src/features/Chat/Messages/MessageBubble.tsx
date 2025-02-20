@@ -9,7 +9,6 @@ interface MessageBubbleProps {
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content }) => {
   const results = parseContent(content.text);
-  console.log(results);
 
   return (
     <div className={`${isUser ? 'message-bubble-user': 'message-bubble'} mb-4 mx-auto`}>

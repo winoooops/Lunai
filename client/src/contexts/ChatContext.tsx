@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ApolloError, DocumentNode, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 import { useSpinnerContext } from "./SpinnerContext";
-import { GET_CHATS } from "@/graphql/operations";
-import { CreateStreamedTextReplyFromConversationDocument, CreateTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamCompleteDocument, OnMessageStreamDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
+import { CreateStreamedTextReplyFromConversationDocument, CreateTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamCompleteDocument, OnMessageStreamDocument, OnReasoningStreamCompleteDocument, OnReasoningStreamDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
 
 interface ChatContextProps {
   chats: Chat[];
@@ -16,6 +15,7 @@ interface ChatContextProps {
   getChatLoading: boolean;
   getChatError: ApolloError | undefined;
   pendingText: { text: string, chatId: string };
+  pendingReasoning: { text: string, chatId: string, messageId: string };
   deleteChatById: (id: string) => void;
   focusChat: (id: string) => void;
   editChat: (id: string, payload: Partial<Chat>) => void;
@@ -30,6 +30,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // TODO: implement cache for chats, meaning that the chats will be fetched from the cache first, and then from the server if not found in the cache
   const [chats, setChats] = useState<Chat[]>([])
   const [pendingText, setPendingText] = useState<{ text: string, chatId: string }>({ text: "", chatId: "" });
+  const [pendingReasoning, setPendingReasoning] = useState<{ text: string, chatId: string, messageId: string }>({ text: "", chatId: "", messageId: "" });
   const [activeChatId, setActiveChatId] = useState<string>("");
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
@@ -47,6 +48,8 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const { data: messageStreamData, error: messageStreamError } = useSubscription(OnMessageStreamDocument);
   const { data: messageStreamCompleteData, error: messageStreamCompleteError } = useSubscription(OnMessageStreamCompleteDocument);
+  const { data: reasoningStreamData, error: reasoningStreamError } = useSubscription(OnReasoningStreamDocument);
+  const { data: reasoningStreamCompleteData, error: reasoningStreamCompleteError } = useSubscription(OnReasoningStreamCompleteDocument);
 
   /**
    * function to send textreply  
@@ -175,6 +178,27 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   },[messageStreamCompleteData]);
 
+  useEffect(() => {
+    if(reasoningStreamData && reasoningStreamData.reasoningStream) {
+      console.log(reasoningStreamData.reasoningStream);
+      setPendingReasoning((prev) => ({
+        chatId: prev.chatId ? prev.chatId : reasoningStreamData.reasoningStream?.chatId ?? "",
+        text: prev.text + (reasoningStreamData.reasoningStream?.content?.[0]?.text ?? ""),
+        messageId: reasoningStreamData.reasoningStream?.messageId ?? ""
+      }));
+    }
+  },[reasoningStreamData]);
+  
+  useEffect(() => {
+    if(reasoningStreamCompleteData?.reasoningStreamComplete) {
+      console.log(reasoningStreamCompleteData.reasoningStreamComplete);
+      const { chatId } = reasoningStreamCompleteData.reasoningStreamComplete;
+      if(chatId === activeChatId) {
+        setPendingReasoning({ chatId: "", text: "", messageId: "" });
+      }
+    }
+  },[reasoningStreamCompleteData])
+
   /**
    * delete chat by id
    * @param {string} id the chatId of the chat to delete 
@@ -233,6 +257,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       getChatLoading,
       deleteChatById,
       pendingText,
+      pendingReasoning,
       focusChat,
       editChat,
       refetchChats,

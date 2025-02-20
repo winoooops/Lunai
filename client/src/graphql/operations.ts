@@ -22,10 +22,12 @@ export const GET_MESSAGES = graphql(`
       timestamp
       id
       model
+      metadata {
+        reasoning_content
+      }
     }
   }
 `);
-
 
 export const GET_MESSAGES_BY_CHAT = graphql(`
   query MessagesFromChat($chatId: String!) {
@@ -37,6 +39,9 @@ export const GET_MESSAGES_BY_CHAT = graphql(`
       content {
         text
         type
+      }
+      metadata {
+        reasoning_content
       }
     }
   }
@@ -57,11 +62,13 @@ export const GET_CHAT = graphql(`
         role
         model
         timestamp
+        metadata {
+          reasoning_content
+        }
       }
     }
   }
-`); 
-
+`);
 
 export const UPDATE_CHAT = graphql(`
   mutation UpdateChat($updateChatId: String!, $input: ChatInput!) {
@@ -91,6 +98,9 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = graphql(`
         text
         type
       }
+      metadata {
+        reasoning_content
+      }
     }
   }
 `);
@@ -107,6 +117,9 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
       }
       role
       model
+      metadata {
+        reasoning_content
+      }
     }
   }
 `);
@@ -123,6 +136,9 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = graphql(`
       }
       role
       model
+      metadata {
+        reasoning_content
+      }
     }
   }
 `);
@@ -139,6 +155,9 @@ export const CREATE_TEXT_REPLY_FROM_CONVERSATION = graphql(`
       model
       role
       timestamp
+      metadata {
+        reasoning_content
+      }
     }
   }
 `);
@@ -170,7 +189,6 @@ export const MESSAGE_STREAM_COMPLETE = graphql(`
     }
   }
 `);
-
 
 export const GET_CONFIG = graphql(`
   query GetConfig {
@@ -233,7 +251,7 @@ export const REASONING_STREAM = graphql(`
       chatId
     }
   }
-`); 
+`);
 
 export const REASONING_STREAM_COMPLETE = graphql(`
   subscription OnReasoningStreamComplete {

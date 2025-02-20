@@ -12,3 +12,25 @@ export interface Message {
   chatId: string;
   metadata?: Record<string, any>;
 }
+
+export interface MessageStream {
+  chatId: string;
+  content: TextContentBlock[];
+  messageId: string;
+}
+
+export interface MessageStreamComplete {
+  chatId: string;
+  finalContent: string;
+}
+
+export interface ReasoningStream {
+  chatId: string;
+  content: TextContentBlock[];
+  messageId: string;
+}
+
+export interface ReasoningStreamComplete {
+  chatId: string;
+  finalContent: string;
+}
