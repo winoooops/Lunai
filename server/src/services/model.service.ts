@@ -12,8 +12,11 @@ export class ModelService {
 
   constructor() {
     const id = uuidv4();
+    const id2 = uuidv4();
     this.models = [
       {id, name: "deepseek-ai/DeepSeek-R1", owned_by: "deepseek"},
+      {id: id2, name: "VIP/deepseek-ai/DeepSeek-V3", owned_by: "deepseek"},
+      // TODO: add grok-beta back in later for v3 release 
       // {id, name: "grok-beta", owned_by: "anthropic"},
     ];
     this.initModels();
