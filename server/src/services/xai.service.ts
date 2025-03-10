@@ -11,6 +11,7 @@ import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from "./config.service";
 import { ModelService } from "./model.service";
 import { axiosFactory } from "@/utils/axiosFactory";
+import { StreamOperationResult } from "@LunaiTypes/service";
 
 class XAIService implements BaseAIService {
   private client: AxiosInstance;
@@ -27,7 +28,7 @@ class XAIService implements BaseAIService {
     this.configService = configService;
     this.modelService = modelService;
   }
-  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<StreamOperationResult> {
     throw new Error("Method not implemented.");
   }
 
@@ -128,7 +129,7 @@ class XAIService implements BaseAIService {
     return this.createTextReplyFromConversation(prompt, chatId);
   }
 
-  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<StreamOperationResult> {
     throw new Error("Method not implemented.");
   }
 }

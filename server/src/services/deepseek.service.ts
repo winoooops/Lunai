@@ -11,6 +11,7 @@ import { PubSub } from "graphql-subscriptions";
 import { Message } from "@LunaiTypes/message";
 import { DeepSeekCompletionResponse, DeepSeekStreamResponse } from "@LunaiTypes/ds";
 import { SYSTEM_PROMPT } from "@prompts/markdown";
+import { StreamOperationResult } from "@LunaiTypes/service";
 
 class DeepSeekService implements BaseAIService {
   private client: AxiosInstance;
@@ -85,13 +86,13 @@ class DeepSeekService implements BaseAIService {
     return this.createTextReplyFromConversation(prompt, chatId);
   }
 
-  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
+  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<StreamOperationResult> {
     const {id: chatId} = this.chatService.createChat({title: prompt, messages: []});
 
     return this.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);  
   }
 
-  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<StreamOperationResult> {
     try {
       const promptMessage: Message = {
         model: this.modelService.getActiveModelName(),
@@ -135,12 +136,30 @@ class DeepSeekService implements BaseAIService {
                 }
               });
 
+              // Save the final message
+              finalMessage = {
+                content: [{ type: "text", text: accumulatedContent }],
+                role: "assistant",
+                timestamp: new Date().toISOString(),
+                id: messageId,
+                model: this.modelService.getActiveModelName(),
+                chatId,
+                metadata: {
+                  reasoning_content: accumulatedReasoningContent
+                }
+              };
+
               pubsub.publish("MESSAGE_STREAM_COMPLETE", {
                 messageStreamComplete: {
                   chatId,
-                  finalContent: accumulatedContent
+                  finalContent: accumulatedContent,
+                  message: finalMessage 
                 }
               });
+
+              this.messageService.addMessage(finalMessage);
+              this.chatService.appendMessage(chatId, finalMessage);
+
               continue;
             }
 
@@ -174,23 +193,11 @@ class DeepSeekService implements BaseAIService {
         }
       }
 
-      // Save the final message
-      finalMessage = {
-        content: [{ type: "text", text: accumulatedContent }],
-        role: "assistant",
-        timestamp: new Date().toISOString(),
-        id: messageId,
-        model: this.modelService.getActiveModelName(),
+      return {
+        success: true,
         chatId,
-        metadata: {
-          reasoning_content: accumulatedReasoningContent
-        }
+        error: undefined
       };
-
-      this.messageService.addMessage(finalMessage);
-      this.chatService.appendMessage(chatId, finalMessage);
-
-      return finalMessage;
     } catch (error) {
       console.error("Error when calling DeepSeekService.createStreamedTextReplyFromConversation: ", error);
       throw new Error(`Error when calling DeepSeekService.createStreamedTextReplyFromConversation: ${error}`);

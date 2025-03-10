@@ -108,18 +108,9 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = graphql(`
 export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
   mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
     createStreamedTextReplyFromPrompt(prompt: $prompt) {
-      id
+      success
       chatId
-      timestamp
-      content {
-        type
-        text
-      }
-      role
-      model
-      metadata {
-        reasoning_content
-      }
+      error
     }
   }
 `);
@@ -127,18 +118,9 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
 export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = graphql(`
   mutation CreateStreamedTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createStreamedTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
-      id
+      success
       chatId
-      timestamp
-      content {
-        type
-        text
-      }
-      role
-      model
-      metadata {
-        reasoning_content
-      }
+      error
     }
   }
 `);
@@ -186,6 +168,20 @@ export const MESSAGE_STREAM_COMPLETE = graphql(`
     messageStreamComplete {
       chatId
       finalContent
+      message {
+        content {
+          text
+          type
+        }
+        role
+        timestamp
+        id
+        model
+        chatId
+        metadata {
+          reasoning_content
+        }
+      }
     }
   }
 `);

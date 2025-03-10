@@ -66,37 +66,45 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const onSendTextReply = async (prompt: string) => {
     try {
       if(activeChat && activeChat.messages.length > 0) {
-      // update the local messages
-      setLocalMessages([...localMessages, { 
-        id: "temp-id",
-        timestamp: new Date().toISOString(),
-        model: "",
-        role: "user",
-        chatId: activeChatId,
-        content: [{ type: "text", text: prompt }]
-      }]);
-      // getting text reply from conversation
-      const { data, errors } = await createStreamedTextReplyFromConversation({ variables: { prompt, chatId: activeChatId }});
+        // update the local messages
+        setLocalMessages([...localMessages, { 
+          id: "temp-id",
+          timestamp: new Date().toISOString(),
+          model: "",
+          role: "user",
+          chatId: activeChatId,
+          content: [{ type: "text", text: prompt }]
+        }]);
+        // getting text reply from conversation
+        const { data, errors } = await createStreamedTextReplyFromConversation({ variables: { prompt, chatId: activeChatId }});
 
-      if(errors) {
-        throw new Error(errors[0].message);
-      }
+        if(errors) {
+          throw new Error(errors[0].message);
+        }
 
-      if(data && data.createStreamedTextReplyFromConversation && data.createStreamedTextReplyFromConversation.chatId) {
-        setLocalMessages((prev) => [...prev, data.createStreamedTextReplyFromConversation as Message]);
-      }
-    } else {
-      const { data, errors } = await createStreamedTextReplyFromPrompt({ variables: { prompt }});
+        if(data?.createStreamedTextReplyFromConversation) {
+          const { chatId, success, error } = data.createStreamedTextReplyFromConversation;
+          if(success) {
+            refetchChats();
+          } else {
+            throw new Error(error ?? "Failed to create streamed text reply from conversation");
+          }
+        }
+      } else {
+        const { data, errors } = await createStreamedTextReplyFromPrompt({ variables: { prompt }});
 
-      if(errors) {
-        throw new Error(errors[0].message);
-      }
-    
-      if(data && data.createStreamedTextReplyFromPrompt && data.createStreamedTextReplyFromPrompt.chatId) {
-        refetchChats();
-      }
+        if(errors) {
+          throw new Error(errors[0].message);
+        }
 
-      setLocalMessages((prev) => [...prev, data?.createStreamedTextReplyFromPrompt as Message]);
+        if(data?.createStreamedTextReplyFromPrompt) {
+          const { success, error } = data.createStreamedTextReplyFromPrompt;
+          if(success) {
+            refetchChats();
+          } else {
+            throw new Error(error ?? "Failed to create streamed text reply from prompt");
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -194,7 +202,10 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   useEffect(() => {
     if(messageStreamCompleteData?.messageStreamComplete) {
-      const { chatId } = messageStreamCompleteData.messageStreamComplete;
+      const { chatId, message } = messageStreamCompleteData.messageStreamComplete;
+
+      setLocalMessages((prev) => [...prev, message as Message]);
+
       if(chatId === activeChatId) {
         setPendingText({ chatId: "", text: "" });
       }

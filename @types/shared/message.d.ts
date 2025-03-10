@@ -22,6 +22,7 @@ export interface MessageStream {
 export interface MessageStreamComplete {
   chatId: string;
   finalContent: string;
+  message: Message;
 }
 
 export interface ReasoningStream {

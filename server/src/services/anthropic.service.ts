@@ -11,6 +11,7 @@ import { PubSub } from "graphql-subscriptions";
 import { ConfigService } from "./config.service";
 import { Config } from "@LunaiTypes/config";
 import { ModelService } from "./model.service";
+import { StreamOperationResult } from "@LunaiTypes/service";
 
 class AnthropicService implements BaseAIService {
   anthropicInstance: Anthropic;
@@ -102,7 +103,7 @@ class AnthropicService implements BaseAIService {
     }
   }
 
-  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<Message> {
+  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<StreamOperationResult> {
     try {
       const { id: chatId } = this.chatService.createChat({ title: prompt, messages: []});
       return this.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);
@@ -112,7 +113,7 @@ class AnthropicService implements BaseAIService {
     }
   }
 
-  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<Message> {
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<StreamOperationResult> {
     try {
       const promptMessage: Message = {
         model: this.modelService.getActiveModelName(),
@@ -150,15 +151,6 @@ class AnthropicService implements BaseAIService {
           });
         })
         .on("message", (_: any) => {
-          // Publish completion event
-          pubsub.publish("MESSAGE_STREAM_COMPLETE", {
-            messageStreamComplete: {
-              chatId,
-              finalContent: accumulatedContent
-            }
-          });
-
-          // Save the final message
           finalMessage = {
             content: [{ type: "text", text: accumulatedContent }],
             role: "assistant",
@@ -167,16 +159,34 @@ class AnthropicService implements BaseAIService {
             model: this.modelService.getActiveModelName(),
             chatId
           };
+          // Publish completion event
+          pubsub.publish("MESSAGE_STREAM_COMPLETE", {
+            messageStreamComplete: {
+              chatId,
+              finalContent: accumulatedContent,
+              message: finalMessage
+            }
+          });
 
+          // Save the final message
           this.messageService.addMessage(finalMessage);
           this.chatService.appendMessage(chatId, finalMessage);
         });
 
       await stream.finalMessage();
-      return finalMessage!;
+
+      return {
+        success: true,
+        chatId,
+        error: undefined
+      };
     } catch (error) {
       console.error("Error when calling AnthropicService.createStreamedTextReplyFromConversation: ", error);
-      throw new Error(`Error when calling AnthropicService.createStreamedTextReplyFromConversation: ${error}`);
+      return {
+        success: false,
+        chatId,
+        error: error instanceof Error ? error.message : "An unknown error occurred"
+      };
     }
   }
 }
