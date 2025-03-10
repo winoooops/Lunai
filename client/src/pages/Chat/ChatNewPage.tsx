@@ -3,14 +3,23 @@ import ChatRecent from "../../features/Chat/History/ChatRecent";
 import MessageInput from "../../features/Chat/Messages/MessageInput";
 import MessageLanding from "../../features/Chat/Messages/MessagesLanding";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ChatNewPage: React.FC<{}> = ({ }) => {
-  const { focusChat } = useChatContext();
+  const { focusChat, activeChatId } = useChatContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // focus the new chat
     focusChat("");
   },[])
+
+  useEffect(() => {
+    if(activeChatId) {
+      focusChat(activeChatId);
+      navigate(`/chat/${activeChatId}`);
+    }
+  }, [activeChatId])
 
 
   return (

@@ -10,6 +10,7 @@ import { ModelService } from "./model.service";
 import { PubSub } from "graphql-subscriptions";
 import { Message } from "@LunaiTypes/message";
 import { DeepSeekCompletionResponse, DeepSeekStreamResponse } from "@LunaiTypes/ds";
+import { SYSTEM_PROMPT } from "@prompts/markdown";
 
 class DeepSeekService implements BaseAIService {
   private client: AxiosInstance;
@@ -19,13 +20,23 @@ class DeepSeekService implements BaseAIService {
   private modelService: ModelService;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string, model?: string) {
-    this.client = axiosFactory(baseURL? baseURL : "https://cloud.luchentech.com/api/maas", apiKey);
+    this.client = axiosFactory(baseURL? baseURL : "https://api.deepseek.com", apiKey);
     this.messageService = messageService;
     this.chatService = chatService;
     this.configService = configService;
     this.modelService = modelService;
   }
 
+  private generateSystemPromptMessage(chatId: string): Message {
+    return {
+      role: "system",
+      content: [{type: "text", text: SYSTEM_PROMPT}],
+      timestamp: new Date().toISOString(),
+      id: uuidv4(),
+      model: this.modelService.getActiveModelName(),
+      chatId
+    }
+  }
   async createTextReplyFromConversation(prompt: string, chatId: string): Promise<Message> {
     try {
       const promptMessage: Message = {
@@ -43,7 +54,7 @@ class DeepSeekService implements BaseAIService {
 
       const response = await this.client.post<DeepSeekCompletionResponse>("/chat/completions", {
         model: this.modelService.getActiveModelName(),
-        messages: [...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
+        messages: [this.generateSystemPromptMessage(chatId), ...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
         stream: false
       })
 
@@ -103,7 +114,7 @@ class DeepSeekService implements BaseAIService {
 
       const response = await this.client.post("/chat/completions", {
         model: this.modelService.getActiveModelName(),
-        messages: [...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
+        messages: [this.generateSystemPromptMessage(chatId), ...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
         stream: true
       }, {
         responseType: 'stream'

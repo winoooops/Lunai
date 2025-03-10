@@ -18,6 +18,7 @@ const MessageList: React.FC<{chatId: string}> = ({ chatId }) => {
           key={index}
           message={message}
           showReasoning={index === messages.length - 1 ? true : false}
+          index={index}
         />
       ))}
 

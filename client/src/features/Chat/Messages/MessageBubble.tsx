@@ -1,6 +1,6 @@
 import { TextContentBlock } from "@LunaiTypes/message";
 import ContentWrapper from "@/ui/ContentWrapper";
-import { parseContent } from "@/hooks/useRenderText";
+import { parseContent, useShowText } from "@/hooks/useRenderText";
 
 interface MessageBubbleProps {
   isUser: boolean;
@@ -8,7 +8,9 @@ interface MessageBubbleProps {
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content }) => {
+  console.log(content.text);
   const results = parseContent(content.text);
+  console.log(results);
 
   return (
     <div className={`${isUser ? 'message-bubble-user': 'message-bubble'} mb-4 mx-auto`}>
@@ -26,8 +28,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content })
                   isCode={result.isCode}
                 />
               ) : (
-                <div className="w-full">
-                  {result.content}
+                <div className="w-full" key={index}>
+                  { useShowText(result.content) }
                 </div>
               )
             )

@@ -26,8 +26,6 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   const { data: activeModelData, loading: activeModelLoading, error: activeModelError, refetch: refetchActiveModel } = useQuery(GetActiveModelDocument);
 
   const [setActiveModelMutation] = useMutation(SetActiveModelDocument);
-
-
   const [setConfigMutation] = useMutation(SetConfigDocument);
 
   /**

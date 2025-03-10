@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/server/src/index.js",
   "scripts": {
     "compile": "tsc && tsc-alias",
-    "start": "tsc && tsc-alias && node --trace-warnings --experimental-specifier-resolution=node dist/index.js"
+    "start": "tsc && tsc-alias && node --trace-warnings --experimental-specifier-resolution=node dist/server/src/index.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

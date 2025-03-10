@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
     "lib": ["es2020", "dom", "dom.iterable"],
     "target": "es2020",
@@ -10,15 +9,16 @@
     "types": ["node"],
     "allowImportingTsExtensions": false,
     "noEmit": false,
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./*"],
       "@LunaiTypes/*": ["../../@types/shared/*"],
+      "@prompts/*": ["../../@prompts/*"]
     }
   },
-  "include": ["src/**/*", "../@types/**/*"],
+  "include": ["src/**/*", "../@types/shared/*", "../@prompts/*"],
   "exclude": ["node_modules"]
 }

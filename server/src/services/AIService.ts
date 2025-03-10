@@ -23,7 +23,6 @@ if(!API_KEY) {
 }
 
 export interface BaseAIService {
-
   /**
    * Generates a text reply based on an array of existing conversation messages. This method sends
    * a request to the API and processes the response to construct a new ChatMessage object,

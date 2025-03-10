@@ -1,7 +1,7 @@
 import {useState} from "react";
 
 export interface LineItem {
-  type: "p" | "li" | "ul" | "ol" | "h3" | "h2" | "h1";
+  type: "p" | "li" | "ul" | "ol" | "h3" | "h2" | "h1" | "hr";
   textContent?: string;
   children?: LineItem[];
 }
@@ -38,19 +38,20 @@ export const parseContent = (text: string): ParsedContent[] => {
       stack.push(lineText);
     } else if (lineText.match(/^```/)) {
       const code = stack.pop()!;
-      const language = code.replace(/^```(\w+)/, "$1");
-      
-      // check if there is a code block wrapping this
-      if (stack.length === 0) {
-        result.push({
-          isCode: true,
-          language,
-          content: currentContent.trim()
-        });
-        currentContent = "";
-      } else {
-        currentContent += lineText;
-      }
+      if(code) {
+        const language = code.replace(/^```(\w+)/, "$1");
+        // check if there is a code block wrapping this
+        if (stack.length === 0) {
+          result.push({
+            isCode: true,
+            language,
+            content: currentContent.trim()
+          });
+          currentContent = "";
+        } else {
+          currentContent += lineText;
+        }
+      } 
     } else {
       currentContent += lineText;
     }
@@ -84,13 +85,18 @@ function convertText2LineItems(text: string): LineItem[] {
 
       // should handle bold & italic here
       if(lineText.includes("**")) {
-        lineText = lineText.replace(/\*\*(.*?)\*\*/, "<strong>$1</strong>");
+        console.log(lineText);
+        lineText = lineText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
       }
       if(lineText.includes("*")) {
-        lineText = lineText.replace(/\*(.*?)\*/, "<em>$1</em>");
+        lineText = lineText.replace(/\*(.*?)\*/g, "<em>$1</em>");
       }
 
-      if(lineText.trim().startsWith("-")) {
+      if(lineText.includes("---")) {
+        lineItem = {
+          type: "hr"
+        }
+      } else if(lineText.trim().startsWith("-")) {
         isOrdered = false;
         lineItem = {
           type: "li",
@@ -156,10 +162,11 @@ function convertText2LineItems(text: string): LineItem[] {
  */
 export function useShowText(text: string) {
   const lineItems = convertText2LineItems(text);
-  console.log(lineItems);
 
   return lineItems.map((lineItem: LineItem, index: number) => {
-    if(lineItem.type === "h1") {
+    if(lineItem.type === "hr"){
+      return <hr key={index} className="my-4 border-t border-gray-700 w-full" />
+    } else if(lineItem.type === "h1") {
       return <h1 key={index} className="text-3xl font-extrabold dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h1>
     } else if (lineItem.type === "h2") {
       return <h2 key={index} className="text-2xl dark:text-white" dangerouslySetInnerHTML={{ __html: lineItem.textContent || "" }}></h2>

@@ -25,7 +25,6 @@ const ModelList: React.FC<{ models: Model[], onSelect: (model: Model) => void }>
 const ModelSelector: React.FC = () => {
   const { models, activeModel, handleSetActiveModel } = useConfigContext();
   const { closeDialog } = useDialog();
-  
 
   const handleSelect = (model: Model) => {
     handleSetActiveModel(model);
