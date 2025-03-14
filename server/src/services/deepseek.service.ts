@@ -12,16 +12,17 @@ import { Message } from "@LunaiTypes/message";
 import { DeepSeekCompletionResponse, DeepSeekStreamResponse } from "@LunaiTypes/ds";
 import { SYSTEM_PROMPT } from "@prompts/markdown";
 import { StreamOperationResult } from "@LunaiTypes/service";
+import { StreamHandler } from "@/utils/streamHandler";
 
 class DeepSeekService implements BaseAIService {
-  private client: AxiosInstance;
-  private messageService: MessageService;
-  private chatService: ChatService;
-  private configService: ConfigService;
-  private modelService: ModelService;
+  private readonly chatService: ChatService;
+  private readonly client: AxiosInstance;
+  private readonly configService: ConfigService;
+  private readonly messageService: MessageService;
+  private readonly modelService: ModelService;
 
   constructor(apiKey: string, messageService: MessageService, chatService: ChatService, configService: ConfigService, modelService: ModelService, baseURL?: string, model?: string) {
-    this.client = axiosFactory(baseURL? baseURL : "https://api.deepseek.com", apiKey);
+    this.client = axiosFactory(baseURL ?? "https://api.deepseek.com", apiKey);
     this.messageService = messageService;
     this.chatService = chatService;
     this.configService = configService;
@@ -49,9 +50,7 @@ class DeepSeekService implements BaseAIService {
         chatId
       }
 
-      this.messageService.addMessage(promptMessage);
-
-      const messages = this.chatService.getChatById(chatId)?.messages || [];
+      const messages = await this.chatService.getChatById(chatId)?.messages || [];
 
       const response = await this.client.post<DeepSeekCompletionResponse>("/chat/completions", {
         model: this.modelService.getActiveModelName(),
@@ -68,10 +67,8 @@ class DeepSeekService implements BaseAIService {
         chatId
       }
 
-      this.messageService.addMessage(message);
-
-      this.chatService.appendMessage(chatId, promptMessage);
-      this.chatService.appendMessage(chatId, message);
+      this.messageService.addMessages([promptMessage, message]);
+      this.chatService.appendMessages(chatId, [promptMessage, message]);
 
       return message;
     } catch (error) {
@@ -103,14 +100,7 @@ class DeepSeekService implements BaseAIService {
         chatId
       };
 
-      this.messageService.addMessage(promptMessage);
-      this.chatService.appendMessage(chatId, promptMessage);
-
-      const messages = this.chatService.getChatById(chatId)?.messages || [];
-
-      let accumulatedContent = '';
-      let accumulatedReasoningContent = '';
-      let finalMessage: Message;
+      const messages = await this.chatService.getChatById(chatId)?.messages || [];
       const messageId = uuidv4();
 
       const response = await this.client.post("/chat/completions", {
@@ -121,77 +111,131 @@ class DeepSeekService implements BaseAIService {
         responseType: 'stream'
       });
 
-      for await (const chunk of response.data) {
-        const lines = chunk.toString().split('\n').filter(Boolean);
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') {
-              // Publish both completion events when stream is done
-              pubsub.publish("REASONING_STREAM_COMPLETE", {
-                reasoningStreamComplete: {
-                  chatId,
-                  finalContent: accumulatedReasoningContent
-                }
-              });
-
-              // Save the final message
-              finalMessage = {
-                content: [{ type: "text", text: accumulatedContent }],
-                role: "assistant",
-                timestamp: new Date().toISOString(),
-                id: messageId,
-                model: this.modelService.getActiveModelName(),
-                chatId,
-                metadata: {
-                  reasoning_content: accumulatedReasoningContent
-                }
-              };
-
-              pubsub.publish("MESSAGE_STREAM_COMPLETE", {
-                messageStreamComplete: {
-                  chatId,
-                  finalContent: accumulatedContent,
-                  message: finalMessage 
-                }
-              });
-
-              this.messageService.addMessage(finalMessage);
-              this.chatService.appendMessage(chatId, finalMessage);
-
-              continue;
-            }
-
-            const parsedData: DeepSeekStreamResponse = JSON.parse(data);
-            if (parsedData.choices && parsedData.choices.length > 0) {
-              const { content = '', reasoning_content = '' } = parsedData.choices[0].delta;
-              
-              if (reasoning_content) {
-                accumulatedReasoningContent += reasoning_content;
-                pubsub.publish("REASONING_STREAM", {
-                  reasoningStream: {
-                    content: [{ type: "text", text: reasoning_content }],
-                    messageId: messageId,
-                    chatId
-                  }
-                });
-              }
-
-              if (content) {
-                accumulatedContent += content;
-                pubsub.publish("MESSAGE_STREAM", {
-                  messageStream: {
-                    content: [{ type: "text", text: content }],
-                    messageId: messageId,
-                    chatId
-                  }
-                });
-              }
+      const streamHandler = new StreamHandler(
+        response.data, 
+        pubsub, 
+        (accumulatedContent, accumulatedReasoningContent) => {
+          const finalMessage = {
+            content: [{ type: "text", text: accumulatedContent }],
+            role: "assistant",
+            timestamp: new Date().toISOString(),
+            id: messageId,
+            model: this.modelService.getActiveModelName(),
+            chatId,
+            metadata: {
+              reasoning_content: accumulatedReasoningContent
             }
           }
+
+          this.messageService.addMessages([promptMessage, finalMessage]);
+          this.chatService.appendMessages(chatId, [promptMessage, finalMessage]);
+        },
+        {
+          onMessage: {
+            triggerName: "MESSAGE_STREAM",
+            buildPayload: (content: string) => ({
+              content: [{ type: "text", text: content }],
+              messageId,
+              chatId
+            })
+          },
+          onReasoningMessage: {
+            triggerName: "REASONING_STREAM",
+            buildPayload: (content: string) => ({
+              content: [{ type: "text", text: content }],
+              messageId,
+            })
+          },
+          onReasoningComplete: {
+            triggerName: "REASONING_STREAM_COMPLETE",
+            buildPayload: (content: string) => ({
+              content: [{ type: "text", text: content }],
+              chatId
+            })
+          },
+          onMessageComplete: {
+            triggerName: "MESSAGE_STREAM_COMPLETE",
+            buildPayload: (content: string) => ({
+              content: [{ type: "text", text: content }],
+              chatId
+            })
+          }
         }
-      }
+      );
+
+      await streamHandler.handleStream();
+
+      // for await (const chunk of response.data) {
+      //   const lines = chunk.toString().split('\n').filter(Boolean);
+        
+      //   for (const line of lines) {
+      //     if (line.startsWith('data: ')) {
+      //       const data = line.slice(6);
+      //       if (data === '[DONE]') {
+      //         // Publish both completion events when stream is done
+      //         pubsub.publish("REASONING_STREAM_COMPLETE", {
+      //           reasoningStreamComplete: {
+      //             chatId,
+      //             finalContent: accumulatedReasoningContent
+      //           }
+      //         });
+
+      //         // Save the final message
+      //         finalMessage = {
+      //           content: [{ type: "text", text: accumulatedContent }],
+      //           role: "assistant",
+      //           timestamp: new Date().toISOString(),
+      //           id: messageId,
+      //           model: this.modelService.getActiveModelName(),
+      //           chatId,
+      //           metadata: {
+      //             reasoning_content: accumulatedReasoningContent
+      //           }
+      //         };
+
+      //         pubsub.publish("MESSAGE_STREAM_COMPLETE", {
+      //           messageStreamComplete: {
+      //             chatId,
+      //             finalContent: accumulatedContent,
+      //             message: finalMessage 
+      //           }
+      //         });
+
+      //         this.messageService.addMessages([promptMessage, finalMessage]);
+      //         this.chatService.appendMessages(chatId, [promptMessage, finalMessage]);
+
+      //         continue;
+      //       }
+
+      //       const parsedData: DeepSeekStreamResponse = JSON.parse(data);
+      //       if (parsedData.choices && parsedData.choices.length > 0) {
+      //         const { content = '', reasoning_content = '' } = parsedData.choices[0].delta;
+              
+      //         if (reasoning_content) {
+      //           accumulatedReasoningContent += reasoning_content;
+      //           pubsub.publish("REASONING_STREAM", {
+      //             reasoningStream: {
+      //               content: [{ type: "text", text: reasoning_content }],
+      //               messageId: messageId,
+      //               chatId
+      //             }
+      //           });
+      //         }
+
+      //         if (content) {
+      //           accumulatedContent += content;
+      //           pubsub.publish("MESSAGE_STREAM", {
+      //             messageStream: {
+      //               content: [{ type: "text", text: content }],
+      //               messageId: messageId,
+      //               chatId
+      //             }
+      //           });
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
 
       return {
         success: true,

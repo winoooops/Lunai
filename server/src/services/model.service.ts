@@ -19,7 +19,7 @@ export class ModelService {
     ];
     this.initModels();
 
-    this.setActiveModel(id);
+    this.setActiveModel(id2);
   }
 
   public static getInstance(): ModelService {

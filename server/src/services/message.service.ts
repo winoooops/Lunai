@@ -24,9 +24,9 @@ export class MessageService {
     this.messages.push(message);
   }
 
-  addMessages(messages: Message[]) {
-    for(let i = 0; i < messages.length; i++) {
-      this.addMessage(messages[i]);
+  addMessages(messages: Message[]): void {
+    for(const element of messages) {
+      this.addMessage(element);
     }
   }
 }

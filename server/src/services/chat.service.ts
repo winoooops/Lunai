@@ -64,4 +64,14 @@ export class ChatService {
 
     return target;
   }
+
+  appendMessages(id: string, messages: Message[]): Chat | undefined {
+    const target = this.getChatById(id);
+
+    if(!target) return;
+
+    target.messages.push(...messages);
+
+    return target;
+  }
 }
