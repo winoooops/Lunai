@@ -108,9 +108,9 @@ export const CREATE_TEXT_REPLY_FROM_PROMPT = graphql(`
 export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
   mutation CreateStreamedTextReplyFromPrompt($prompt: String!) {
     createStreamedTextReplyFromPrompt(prompt: $prompt) {
-      success
       chatId
-      error
+      streamType
+      streamStatus
     }
   }
 `);
@@ -118,9 +118,24 @@ export const CREATE_STREAMED_TEXT_REPLY_FROM_PROMPT = graphql(`
 export const CREATE_STREAMED_TEXT_REPLY_FROM_CONVERSATION = graphql(`
   mutation CreateStreamedTextReplyFromConversation($prompt: String!, $chatId: String!) {
     createStreamedTextReplyFromConversation(prompt: $prompt, chatId: $chatId) {
-      success
+      streamType
+      streamStatus
       chatId
-      error
+      content
+      message {
+        id
+        content {
+          text
+          type
+        }
+        role
+        timestamp
+        model
+        chatId
+        metadata {
+          reasoning_content
+        }
+      }
     }
   }
 `);
@@ -153,6 +168,8 @@ export const DELETE_CHAT = graphql(`
 export const MESSAGE_STREAM = graphql(`
   subscription OnMessageStream {
     messageStream {
+      streamType
+      streamStatus
       messageId
       content {
         type
@@ -163,11 +180,10 @@ export const MESSAGE_STREAM = graphql(`
   }
 `);
 
-export const MESSAGE_STREAM_COMPLETE = graphql(`
-  subscription OnMessageStreamComplete {
-    messageStreamComplete {
+export const MESSAGE_STREAM_DONE = graphql(`
+  subscription OnMessageStreamDone {
+    messageStreamDone {
       chatId
-      finalContent
       message {
         content {
           text
@@ -249,11 +265,10 @@ export const REASONING_STREAM = graphql(`
   }
 `);
 
-export const REASONING_STREAM_COMPLETE = graphql(`
-  subscription OnReasoningStreamComplete {
-    reasoningStreamComplete {
+export const REASONING_STREAM_DONE = graphql(`
+  subscription OnReasoningStreamDone {
+    reasoningStreamDone {
       chatId
-      finalContent
     }
   }
 `);

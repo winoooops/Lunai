@@ -53,10 +53,12 @@ export class StreamHandler {
 
         const parsedData = JSON.parse(data) as StreamResponse;
         if(parsedData.choices && parsedData.choices.length > 0) {
+          console.log(parsedData.choices[0].delta);
           const { content = '', reasoning_content = '' } = parsedData.choices[0].delta;
 
           if(reasoning_content) {
             this.accumulatedReasoningContent += reasoning_content;
+            console.log("reasoning_content: ", reasoning_content);
             this.onReasoningMessage(reasoning_content);
           }
 
@@ -78,14 +80,14 @@ export class StreamHandler {
 
   private onMessageComplete(): void{
     const { triggerName, buildPayload } = this.config.onMessageComplete;
-    const payload = buildPayload(this.accumulatedContent);
-
+    const payload = buildPayload({ content: this.accumulatedContent, reasoning_content: this.accumulatedReasoningContent });
     this.pubsub.publish(triggerName, payload);
   }
 
   private onReasoningMessage(reasoning_content: string): void {
     const { triggerName, buildPayload } = this.config.onReasoningMessage;
     const payload = buildPayload(reasoning_content);
+    console.log("reasoning_content payload: ", payload);
 
     this.pubsub.publish(triggerName, payload);
   }

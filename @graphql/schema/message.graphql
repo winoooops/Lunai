@@ -3,10 +3,33 @@ type TextContentBlock {
   type: String!
 }
 
-type StreamOperationResult {
+type RestResponse {
   success: Boolean!
+  statusCode: Int!
+}
+
+type StreamOnResponse {
+  streamType: String!
+  streamStatus: String!
   chatId: String!
-  error: String
+  messageId: String!
+  content: [TextContentBlock]
+}
+
+type StreamDoneResponse {
+  streamType: String!
+  streamStatus: String!
+  chatId: String!
+  content: String!
+  message: Message
+}
+
+type StreamCompleteResponse {
+  streamType: String!
+  streamStatus: String!
+  chatId: String!
+  content: String!
+  message: Message
 }
 
 type Metadata {
@@ -23,34 +46,12 @@ type Message {
   metadata: Metadata
 }
 
-type MessageStream {
-  chatId: String!
-  messageId: String!
-  content: [TextContentBlock]
-}
-
-type MessageStreamComplete {
-  chatId: String!
-  finalContent: String!
-  message: Message!
-}
-
-type ReasoningStream {
-  chatId: String!
-  messageId: String!
-  content: [TextContentBlock]
-}
-
-type ReasoningStreamComplete {
-  chatId: String!
-  finalContent: String!
-}
 
 type Subscription {
-  messageStream: MessageStream
-  messageStreamComplete: MessageStreamComplete
-  reasoningStream: ReasoningStream
-  reasoningStreamComplete: ReasoningStreamComplete
+  messageStream: StreamOnResponse
+  messageStreamDone: StreamDoneResponse
+  reasoningStream: StreamOnResponse
+  reasoningStreamDone: StreamDoneResponse
 }
 
 input TextContentBlockInput {
@@ -71,6 +72,6 @@ type Query {
 type Mutation {
   createTextReplyFromConversation(prompt: String!, chatId: String!): Message
   createTextReplyFromPrompt(prompt: String!): Message
-  createStreamedTextReplyFromPrompt(prompt: String!): StreamOperationResult
-  createStreamedTextReplyFromConversation(prompt: String!, chatId: String!): StreamOperationResult
+  createStreamedTextReplyFromPrompt(prompt: String!): StreamCompleteResponse
+  createStreamedTextReplyFromConversation(prompt: String!, chatId: String!): StreamCompleteResponse
 }

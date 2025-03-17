@@ -10,6 +10,7 @@ import { ConfigService } from './config.service';
 import { ModelService } from './model.service';
 import DeepSeekService from './deepseek.service';
 import { StreamOperationResult } from '@LunaiTypes/service';
+import { ChatStreamCompleteResponseBody } from '@LunaiTypes/response';
 
 config();
 
@@ -51,7 +52,7 @@ export interface BaseAIService {
    * @param {PubSub} pubsub The PubSub instance to publish the streamed message to.
    * @returns {Promise<Message>} A Promise that resolves to the finalized generated Message object.
    */
-  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<StreamOperationResult>;
+  createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<ChatStreamCompleteResponseBody>;
 
   /**
    * Creates a streamed text reply from a conversation.
@@ -61,7 +62,7 @@ export interface BaseAIService {
    * @param {PubSub} pubsub The PubSub instance to publish the streamed message to.
    * @returns {Promise<Message>} A Promise that resolves to the finalized generated Message object.
    */
-  createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<StreamOperationResult>;
+  createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<ChatStreamCompleteResponseBody>;
 }
 
 export const getAIService = (): BaseAIService => {

@@ -9,10 +9,10 @@ import { ConfigService } from "./config.service";
 import { ModelService } from "./model.service";
 import { PubSub } from "graphql-subscriptions";
 import { Message } from "@LunaiTypes/message";
-import { DeepSeekCompletionResponse, DeepSeekStreamResponse } from "@LunaiTypes/ds";
+import { DeepSeekCompletionResponse } from "@LunaiTypes/ds";
 import { SYSTEM_PROMPT } from "@prompts/markdown";
-import { StreamOperationResult } from "@LunaiTypes/service";
 import { StreamHandler } from "@/utils/streamHandler";
+import { ChatStreamCompleteResponseBody, ChatStreamDoneResponseBody, ChatStreamOnResponseBody } from "@LunaiTypes/response";
 
 class DeepSeekService implements BaseAIService {
   private readonly chatService: ChatService;
@@ -83,13 +83,13 @@ class DeepSeekService implements BaseAIService {
     return this.createTextReplyFromConversation(prompt, chatId);
   }
 
-  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<StreamOperationResult> {
+  async createStreamedTextReplyFromPrompt(prompt: string, pubsub: PubSub): Promise<ChatStreamCompleteResponseBody> {
     const {id: chatId} = this.chatService.createChat({title: prompt, messages: []});
 
     return this.createStreamedTextReplyFromConversation(prompt, chatId, pubsub);  
   }
 
-  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<StreamOperationResult> {
+  async createStreamedTextReplyFromConversation(prompt: string, chatId: string, pubsub: PubSub): Promise<ChatStreamCompleteResponseBody> {
     try {
       const promptMessage: Message = {
         model: this.modelService.getActiveModelName(),
@@ -105,7 +105,7 @@ class DeepSeekService implements BaseAIService {
 
       const response = await this.client.post("/chat/completions", {
         model: this.modelService.getActiveModelName(),
-        messages: [this.generateSystemPromptMessage(chatId), ...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
+        messages: [...messages, promptMessage].map((item) => ({...item, content: item.content[0].text})),
         stream: true
       }, {
         responseType: 'stream'
@@ -133,31 +133,61 @@ class DeepSeekService implements BaseAIService {
         {
           onMessage: {
             triggerName: "MESSAGE_STREAM",
-            buildPayload: (content: string) => ({
-              content: [{ type: "text", text: content }],
-              messageId,
-              chatId
+            buildPayload: (content: string): { messageStream:ChatStreamOnResponseBody } => ({
+              messageStream: {
+                streamType: "message",
+                streamStatus: "in_progress",
+                content: [{ type: "text", text: content }],
+                messageId,
+                chatId
+              }
             })
+            
           },
           onReasoningMessage: {
             triggerName: "REASONING_STREAM",
-            buildPayload: (content: string) => ({
-              content: [{ type: "text", text: content }],
-              messageId,
+            buildPayload: (content: string): { reasoningStream: ChatStreamOnResponseBody } => ({
+              reasoningStream: {
+                streamType: "reasoning",
+                streamStatus: "in_progress",
+                content: [{ type: "text", text: content }],
+                messageId,
+                chatId
+              }
             })
           },
           onReasoningComplete: {
-            triggerName: "REASONING_STREAM_COMPLETE",
-            buildPayload: (content: string) => ({
-              content: [{ type: "text", text: content }],
-              chatId
+            triggerName: "REASONING_STREAM_DONE",
+            buildPayload: (finalContent: string): { reasoningStreamDone: ChatStreamDoneResponseBody } => ({
+              reasoningStreamDone: {
+                streamType: "reasoning",
+                streamStatus: "done",
+                content: [{ type: "text", text: finalContent }],
+                chatId
+              }
             })
           },
           onMessageComplete: {
-            triggerName: "MESSAGE_STREAM_COMPLETE",
-            buildPayload: (content: string) => ({
-              content: [{ type: "text", text: content }],
-              chatId
+            triggerName: "MESSAGE_STREAM_DONE",
+            buildPayload: ({ finalContent, finalReasoningContent }: { finalContent: string, finalReasoningContent: string }): { messageStreamDone: ChatStreamDoneResponseBody } => ({
+              messageStreamDone: {
+                streamType: "message",
+                streamStatus: "done",
+                content: [{ type: "text", text: finalContent }],
+                chatId,
+                messageId,
+                message: {
+                  content: [{ type: "text", text: finalContent }],
+                  role: "assistant",
+                  timestamp: new Date().toISOString(),
+                  id: messageId,
+                  model: this.modelService.getActiveModelName(),
+                  chatId,
+                  metadata: {
+                    reasoning_content: finalReasoningContent
+                  }
+                }
+              }
             })
           }
         }
@@ -165,86 +195,19 @@ class DeepSeekService implements BaseAIService {
 
       await streamHandler.handleStream();
 
-      // for await (const chunk of response.data) {
-      //   const lines = chunk.toString().split('\n').filter(Boolean);
-        
-      //   for (const line of lines) {
-      //     if (line.startsWith('data: ')) {
-      //       const data = line.slice(6);
-      //       if (data === '[DONE]') {
-      //         // Publish both completion events when stream is done
-      //         pubsub.publish("REASONING_STREAM_COMPLETE", {
-      //           reasoningStreamComplete: {
-      //             chatId,
-      //             finalContent: accumulatedReasoningContent
-      //           }
-      //         });
-
-      //         // Save the final message
-      //         finalMessage = {
-      //           content: [{ type: "text", text: accumulatedContent }],
-      //           role: "assistant",
-      //           timestamp: new Date().toISOString(),
-      //           id: messageId,
-      //           model: this.modelService.getActiveModelName(),
-      //           chatId,
-      //           metadata: {
-      //             reasoning_content: accumulatedReasoningContent
-      //           }
-      //         };
-
-      //         pubsub.publish("MESSAGE_STREAM_COMPLETE", {
-      //           messageStreamComplete: {
-      //             chatId,
-      //             finalContent: accumulatedContent,
-      //             message: finalMessage 
-      //           }
-      //         });
-
-      //         this.messageService.addMessages([promptMessage, finalMessage]);
-      //         this.chatService.appendMessages(chatId, [promptMessage, finalMessage]);
-
-      //         continue;
-      //       }
-
-      //       const parsedData: DeepSeekStreamResponse = JSON.parse(data);
-      //       if (parsedData.choices && parsedData.choices.length > 0) {
-      //         const { content = '', reasoning_content = '' } = parsedData.choices[0].delta;
-              
-      //         if (reasoning_content) {
-      //           accumulatedReasoningContent += reasoning_content;
-      //           pubsub.publish("REASONING_STREAM", {
-      //             reasoningStream: {
-      //               content: [{ type: "text", text: reasoning_content }],
-      //               messageId: messageId,
-      //               chatId
-      //             }
-      //           });
-      //         }
-
-      //         if (content) {
-      //           accumulatedContent += content;
-      //           pubsub.publish("MESSAGE_STREAM", {
-      //             messageStream: {
-      //               content: [{ type: "text", text: content }],
-      //               messageId: messageId,
-      //               chatId
-      //             }
-      //           });
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
-
       return {
-        success: true,
+        streamType: "message",
+        streamStatus: "complete",
         chatId,
-        error: undefined
       };
     } catch (error) {
       console.error("Error when calling DeepSeekService.createStreamedTextReplyFromConversation: ", error);
-      throw new Error(`Error when calling DeepSeekService.createStreamedTextReplyFromConversation: ${error}`);
+      return {
+        streamType: "message",
+        streamStatus: "error",
+        chatId,
+        errors: error instanceof Error ? error.message : "An unknown error occurred"
+      } as ChatStreamCompleteResponseBody;
     }
   }
 }

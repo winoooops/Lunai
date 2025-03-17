@@ -3,7 +3,7 @@ import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery,
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 import { useSpinnerContext } from "./SpinnerContext";
-import { CreateStreamedTextReplyFromConversationDocument, CreateStreamedTextReplyFromPromptDocument, CreateTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamCompleteDocument, OnMessageStreamDocument, OnReasoningStreamCompleteDocument, OnReasoningStreamDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
+import { CreateStreamedTextReplyFromConversationDocument, CreateStreamedTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamDocument, OnMessageStreamDoneDocument, OnReasoningStreamDocument, OnReasoningStreamDoneDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
 
 export interface ChatContextProps {
   chats: Chat[];
@@ -44,19 +44,19 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
 
   const { data: chatsData, refetch: refetchChatsData } = useQuery(GetChatsDocument);
-  const [getChat, { loading: getChatLoading, error: getChatError, refetch: refetchChat }] = useLazyQuery(GetChatDocument, { fetchPolicy: 'network-only' });
+  const [getChat, { loading: getChatLoading, error: getChatError }] = useLazyQuery(GetChatDocument, { fetchPolicy: 'network-only' });
 
   const [updateChat, { loading: updateChatLoading, error: updateChatError }] = useMutation(UpdateChatDocument);
   const [deleteChat] = useMutation(DeleteChatDocument);
 
-  const [createTextReplyFromPrompt] = useMutation(CreateTextReplyFromPromptDocument);
+  // const [createTextReplyFromPrompt] = useMutation(CreateTextReplyFromPromptDocument);
   const [createStreamedTextReplyFromPrompt] = useMutation(CreateStreamedTextReplyFromPromptDocument);
   const [createStreamedTextReplyFromConversation] = useMutation(CreateStreamedTextReplyFromConversationDocument);
 
   const { data: messageStreamData, error: messageStreamError } = useSubscription(OnMessageStreamDocument);
-  const { data: messageStreamCompleteData, error: messageStreamCompleteError } = useSubscription(OnMessageStreamCompleteDocument);
+  const { data: messageStreamDoneData, error: messageStreamDoneError } = useSubscription(OnMessageStreamDoneDocument);
   const { data: reasoningStreamData, error: reasoningStreamError } = useSubscription(OnReasoningStreamDocument);
-  const { data: reasoningStreamCompleteData, error: reasoningStreamCompleteError } = useSubscription(OnReasoningStreamCompleteDocument);
+  const { data: reasoningStreamDoneData, error: reasoningStreamDoneError } = useSubscription(OnReasoningStreamDoneDocument);
 
   /**
    * function to send textreply  
@@ -83,11 +83,11 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
 
         if(data?.createStreamedTextReplyFromConversation) {
-          const { chatId, success, error } = data.createStreamedTextReplyFromConversation;
-          if(success) {
+          const { streamStatus } = data.createStreamedTextReplyFromConversation;
+          if(streamStatus === "complete") {
             refetchChats();
           } else {
-            throw new Error(error ?? "Failed to create streamed text reply from conversation");
+            throw new Error("Failed to create streamed text reply from conversation");
           }
         }
       } else {
@@ -201,8 +201,8 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   
 
   useEffect(() => {
-    if(messageStreamCompleteData?.messageStreamComplete) {
-      const { chatId, message } = messageStreamCompleteData.messageStreamComplete;
+    if(messageStreamDoneData?.messageStreamDone) {
+      const { chatId, message } = messageStreamDoneData.messageStreamDone;
 
       setLocalMessages((prev) => [...prev, message as Message]);
 
@@ -210,7 +210,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setPendingText({ chatId: "", text: "" });
       }
     }
-  },[messageStreamCompleteData]);
+  },[messageStreamDoneData]);
 
   useEffect(() => {
     if(reasoningStreamData && reasoningStreamData.reasoningStream) {
@@ -228,13 +228,13 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   },[reasoningStreamData]);
   
   useEffect(() => {
-    if(reasoningStreamCompleteData?.reasoningStreamComplete) {
-      const { chatId } = reasoningStreamCompleteData.reasoningStreamComplete;
+    if(reasoningStreamDoneData?.reasoningStreamDone) {
+      const { chatId } = reasoningStreamDoneData.reasoningStreamDone;
       if(chatId === activeChatId) {
         setPendingReasoning({ chatId: "", text: "", messageId: "" });
       }
     }
-  },[reasoningStreamCompleteData])
+  },[reasoningStreamDoneData])
 
   /**
    * delete chat by id
@@ -273,8 +273,16 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     console.error(messageStreamError);
   }
 
-  if(messageStreamCompleteError) {
-    console.error(messageStreamCompleteError);
+  if(messageStreamDoneError) {
+    console.error(messageStreamDoneError);
+  }
+
+  if(reasoningStreamError) {
+    console.error(reasoningStreamError);
+  }
+
+  if(reasoningStreamDoneError) {
+    console.error(reasoningStreamDoneError);
   }
 
   const refetchChats = () => refetchChatsData();
