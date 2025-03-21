@@ -8,9 +8,7 @@ interface MessageBubbleProps {
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content }) => {
-  console.log(content.text);
   const results = parseContent(content.text);
-  console.log(results);
 
   return (
     <div className={`${isUser ? 'message-bubble-user': 'message-bubble'} mb-4 mx-auto`}>
@@ -19,16 +17,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ isUser, content })
       }`}>
         <div className="text-container">
           {
-            results.map((result, index) => 
+            results.map((result) => 
               result.isCode ? (
                 <ContentWrapper 
-                  key={index}
+                  key={result.content}
                   content={result.content}
                   language={result.language}
                   isCode={result.isCode}
                 />
               ) : (
-                <div className="w-full" key={index}>
+                <div className="w-full" key={result.content}>
                   { useShowText(result.content) }
                 </div>
               )

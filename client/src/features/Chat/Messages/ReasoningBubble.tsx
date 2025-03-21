@@ -10,9 +10,8 @@ interface ReasoningBubbleProps {
   isPending?: boolean;
 }
 
-export const ReasoningBubble: React.FC<ReasoningBubbleProps> = ({ reasoningContent, chatId, messageId, showReasoning = false, isPending = false }) => {
+export const ReasoningBubble: React.FC<ReasoningBubbleProps> = ({ reasoningContent, showReasoning = false, isPending = false }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(showReasoning);
-  console.log(reasoningContent);
 
   useEffect(() => {
     if(isPending) {

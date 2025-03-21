@@ -85,7 +85,6 @@ function convertText2LineItems(text: string): LineItem[] {
 
       // should handle bold & italic here
       if(lineText.includes("**")) {
-        console.log(lineText);
         lineText = lineText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
       }
       if(lineText.includes("*")) {

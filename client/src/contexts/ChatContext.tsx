@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { ApolloError, LazyQueryHookOptions, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Chat } from "@LunaiTypes/chat";
 import { Message } from "@LunaiTypes/message";
 import { useSpinnerContext } from "./SpinnerContext";
-import { CreateStreamedTextReplyFromConversationDocument, CreateStreamedTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, OnMessageStreamDocument, OnMessageStreamDoneDocument, OnReasoningStreamDocument, OnReasoningStreamDoneDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
+import { CreateStreamedTextReplyFromConversationDocument, CreateStreamedTextReplyFromPromptDocument, DeleteChatDocument, GetChatDocument, GetChatsDocument, UpdateChatDocument } from "@/graphql/generated/graphql";
+import { useStreamResponse } from "@/hooks/useStreamResponse";
 
 export interface ChatContextProps {
   chats: Chat[];
@@ -31,10 +32,6 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const { enableLoading, disableLoading } = useSpinnerContext();
   // TODO: implement cache for chats, meaning that the chats will be fetched from the cache first, and then from the server if not found in the cache
   const [chats, setChats] = useState<Chat[]>([])
-  // used to store the streamed text reply from the conversation with the chatId
-  const [pendingText, setPendingText] = useState<{ text: string, chatId: string }>({ text: "", chatId: "" });
-  // used to store the streamed reasoning from the conversation with the chatId and messageId
-  const [pendingReasoning, setPendingReasoning] = useState<{ text: string, chatId: string, messageId: string }>({ text: "", chatId: "", messageId: "" });
   // used to store the active chatId
   const [activeChatId, setActiveChatId] = useState<string>("");
   // used to store the active chat
@@ -53,10 +50,8 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [createStreamedTextReplyFromPrompt] = useMutation(CreateStreamedTextReplyFromPromptDocument);
   const [createStreamedTextReplyFromConversation] = useMutation(CreateStreamedTextReplyFromConversationDocument);
 
-  const { data: messageStreamData, error: messageStreamError } = useSubscription(OnMessageStreamDocument);
-  const { data: messageStreamDoneData, error: messageStreamDoneError } = useSubscription(OnMessageStreamDoneDocument);
-  const { data: reasoningStreamData, error: reasoningStreamError } = useSubscription(OnReasoningStreamDocument);
-  const { data: reasoningStreamDoneData, error: reasoningStreamDoneError } = useSubscription(OnReasoningStreamDoneDocument);
+  const { pendingText, pendingReasoning, setPendingText } = useStreamResponse(activeChatId, setActiveChatId, setLocalMessages);
+
 
   /**
    * function to send textreply  
@@ -64,8 +59,9 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
    * @param routingCallback the callback function to navigate to the new chat
    */
   const onSendTextReply = async (prompt: string) => {
+    console.log(activeChatId);
     try {
-      if(activeChat && activeChat.messages.length > 0) {
+      if(activeChatId) {
         // update the local messages
         setLocalMessages([...localMessages, { 
           id: "temp-id",
@@ -98,11 +94,11 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
 
         if(data?.createStreamedTextReplyFromPrompt) {
-          const { success, error } = data.createStreamedTextReplyFromPrompt;
-          if(success) {
+          const { streamStatus } = data.createStreamedTextReplyFromPrompt;
+          if(streamStatus === "complete") {
             refetchChats();
           } else {
-            throw new Error(error ?? "Failed to create streamed text reply from prompt");
+            throw new Error("Failed to create streamed text reply from prompt");
           }
         }
       }
@@ -181,60 +177,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setLocalMessages([]);
     setActiveChatId("");
   }
-
-  // Handle message stream updates
-  useEffect(() => {
-    if(messageStreamData && messageStreamData.messageStream) {
-      const chatId = messageStreamData.messageStream?.chatId ?? "";
-      if(!activeChatId && chatId) {
-        setActiveChatId(chatId);
-      }
-
-      setPendingText((prev) => ({
-        // TODO: fix this 
-        chatId: prev.chatId ? prev.chatId : messageStreamData.messageStream?.chatId ?? "",
-        text: prev.text + (messageStreamData.messageStream?.content?.[0]?.text ?? "")
-      }));
-
-    }
-  },[messageStreamData]);
   
-
-  useEffect(() => {
-    if(messageStreamDoneData?.messageStreamDone) {
-      const { chatId, message } = messageStreamDoneData.messageStreamDone;
-
-      setLocalMessages((prev) => [...prev, message as Message]);
-
-      if(chatId === activeChatId) {
-        setPendingText({ chatId: "", text: "" });
-      }
-    }
-  },[messageStreamDoneData]);
-
-  useEffect(() => {
-    if(reasoningStreamData && reasoningStreamData.reasoningStream) {
-      const chatId = reasoningStreamData.reasoningStream?.chatId ?? "";
-      if(!activeChatId && chatId) {
-        setActiveChatId(chatId);
-      }
-
-      setPendingReasoning((prev) => ({
-        chatId: prev.chatId ? prev.chatId : reasoningStreamData.reasoningStream?.chatId ?? "",
-        text: prev.text + (reasoningStreamData.reasoningStream?.content?.[0]?.text ?? ""),
-        messageId: reasoningStreamData.reasoningStream?.messageId ?? ""
-      }));
-    }
-  },[reasoningStreamData]);
-  
-  useEffect(() => {
-    if(reasoningStreamDoneData?.reasoningStreamDone) {
-      const { chatId } = reasoningStreamDoneData.reasoningStreamDone;
-      if(chatId === activeChatId) {
-        setPendingReasoning({ chatId: "", text: "", messageId: "" });
-      }
-    }
-  },[reasoningStreamDoneData])
 
   /**
    * delete chat by id
@@ -268,22 +211,7 @@ export const ChatContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.error(errors);
     }
   }
-
-  if(messageStreamError) {
-    console.error(messageStreamError);
-  }
-
-  if(messageStreamDoneError) {
-    console.error(messageStreamDoneError);
-  }
-
-  if(reasoningStreamError) {
-    console.error(reasoningStreamError);
-  }
-
-  if(reasoningStreamDoneError) {
-    console.error(reasoningStreamDoneError);
-  }
+  
 
   const refetchChats = () => refetchChatsData();
 
